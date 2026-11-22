@@ -1,0 +1,19 @@
+name: Branch policy
+
+# Enforces which branches may open PRs into staging and main (see docs/CONTRIBUTING.md).
+on:
+  pull_request:
+    branches: [staging, main]
+
+jobs:
+  branch-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+        run: |
+          case "$BASE:$HEAD" in
+            staging:dev | main:staging | main:hotfix/*) echo "OK: $HEAD -> $BASE" ;;
+            *) echo "::error::PRs into $BASE must come from $([ "$BASE" = main ] && echo 'staging or hotfix/*' || echo 'dev'), not $HEAD"; exit 1 ;;
+          esac

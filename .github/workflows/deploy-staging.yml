@@ -1,0 +1,17 @@
+name: Deploy staging (placeholder)
+
+# Manual trigger only until a hosting target is chosen (ADR-004, status: proposed).
+# Planned trigger: push to `staging`.
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      # TODO: build and push backend + frontend Docker images (tag: sha-<short sha>)
+      # TODO: deploy images to the staging host (target TBD, ADR-004)
+      # TODO: run smoke test against https://<staging-host>/api/health
+      - run: echo "Staging deploy not configured yet. See docs/devops.md."

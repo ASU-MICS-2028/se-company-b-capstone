@@ -1,0 +1,17 @@
+name: Deploy production (placeholder)
+
+# Manual trigger only until a hosting target is chosen (ADR-004, status: proposed).
+# Planned trigger: push of a release tag `v*.*.*` on `main`.
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      # TODO: promote the image already tested on staging (same digest, retag as vX.Y.Z), don't rebuild
+      # TODO: deploy to the production host (target TBD, ADR-004); requires environment approval
+      # TODO: run smoke test against https://<prod-host>/api/health
+      - run: echo "Production deploy not configured yet. See docs/devops.md."

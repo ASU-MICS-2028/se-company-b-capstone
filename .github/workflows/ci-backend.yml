@@ -1,0 +1,51 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [dev, staging, main]
+    paths: ["backend/**", ".github/workflows/ci-backend.yml"]
+  pull_request:
+    branches: [dev, staging, main]
+    paths: ["backend/**", ".github/workflows/ci-backend.yml"]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+
+      - run: pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Test (unit + api + acceptance, skip @pending)
+        run: >
+          pytest tests/unit tests/api tests/acceptance -m "not pending"
+          --junitxml=junit.xml
+          --cov=app --cov-report=term --cov-report=xml
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          echo '### Backend coverage' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          coverage report >> "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: |
+            backend/junit.xml
+            backend/coverage.xml
