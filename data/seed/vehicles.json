@@ -1,0 +1,160 @@
+{
+  "version": "1.0-sprint1",
+  "generated": "2026-11-21",
+  "note": "Starter catalogue for vehicle registration. rules_supported means an exact verified applicability exists for at least one configuration in the row. Require exact year, source market, powertrain and body style for the selected rule. Allow manual vehicle entry.",
+  "vehicles": [
+    {
+      "catalogue_id": "V01",
+      "make": "Toyota",
+      "model": "Corolla",
+      "year_from": 2014,
+      "year_to": 2018,
+      "powertrains": [
+        "petrol"
+      ],
+      "rules_supported": false,
+      "note": "Catalogue entry only. Match an owner handbook before enabling a schedule.",
+      "rule_ids": []
+    },
+    {
+      "catalogue_id": "V02",
+      "make": "Toyota",
+      "model": "Corolla",
+      "year_from": 2019,
+      "year_to": 2022,
+      "powertrains": [
+        "petrol",
+        "hybrid"
+      ],
+      "rules_supported": false,
+      "note": "Catalogue entry only. Match an owner handbook before enabling a schedule.",
+      "rule_ids": []
+    },
+    {
+      "catalogue_id": "V03",
+      "make": "Toyota",
+      "model": "Corolla",
+      "year_from": 2023,
+      "year_to": 2025,
+      "powertrains": [
+        "petrol",
+        "hybrid"
+      ],
+      "rules_supported": true,
+      "rule_ids": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05"
+      ],
+      "note": "Active rules apply to US petrol sedans only. Hybrids and hatchbacks can use manual profile entry or a catalogue entry without reminder coverage."
+    },
+    {
+      "catalogue_id": "V04",
+      "make": "Toyota",
+      "model": "Camry",
+      "year_from": 2018,
+      "year_to": 2022,
+      "powertrains": [
+        "petrol",
+        "hybrid"
+      ],
+      "rules_supported": false,
+      "note": "Catalogue entry only. Match an owner handbook before enabling a schedule.",
+      "rule_ids": []
+    },
+    {
+      "catalogue_id": "V05",
+      "make": "Toyota",
+      "model": "Camry",
+      "year_from": 2023,
+      "year_to": 2024,
+      "powertrains": [
+        "petrol",
+        "hybrid"
+      ],
+      "rules_supported": true,
+      "rule_ids": [
+        "R07",
+        "R08"
+      ],
+      "note": "Active rules apply to US petrol sedans only. The hybrid guide requires separate verification."
+    },
+    {
+      "catalogue_id": "V06",
+      "make": "Toyota",
+      "model": "Camry",
+      "year_from": 2025,
+      "year_to": 2025,
+      "powertrains": [
+        "hybrid"
+      ],
+      "rules_supported": true,
+      "rule_ids": [
+        "R07",
+        "R08"
+      ],
+      "note": "Active rules apply to the US hybrid sedan."
+    },
+    {
+      "catalogue_id": "V07",
+      "make": "Honda",
+      "model": "CR-V",
+      "year_from": 2007,
+      "year_to": 2016,
+      "powertrains": [
+        "petrol"
+      ],
+      "rules_supported": false,
+      "note": "Catalogue entry only. Match an owner handbook before enabling a schedule.",
+      "rule_ids": []
+    },
+    {
+      "catalogue_id": "V08",
+      "make": "Honda",
+      "model": "CR-V",
+      "year_from": 2017,
+      "year_to": 2025,
+      "powertrains": [
+        "petrol",
+        "hybrid"
+      ],
+      "rules_supported": true,
+      "rule_ids": [
+        "R09",
+        "R10",
+        "R11"
+      ],
+      "note": "Active rules cover 2025 Canadian petrol and hybrid models. Confirm the exact schedule for older years or other markets."
+    }
+  ],
+  "powertrain_values": [
+    "petrol",
+    "diesel",
+    "hybrid",
+    "plug_in_hybrid",
+    "electric"
+  ],
+  "driving_condition_values": [
+    "normal",
+    "primarily_dirt_or_dusty",
+    "other_special_use",
+    "unknown"
+  ],
+  "source_market_values": [
+    "US",
+    "CA",
+    "GH",
+    "OTHER",
+    "UNKNOWN"
+  ],
+  "body_style_values": [
+    "sedan",
+    "hatchback",
+    "suv",
+    "other",
+    "unknown"
+  ],
+  "condition_input_note": "Record any other special use and regular dusty gravel or visible soot separately. Record confirmation of previous Toyota oil specification. Use explicit unknowns."
+}

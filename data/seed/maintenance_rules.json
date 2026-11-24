@@ -1,0 +1,528 @@
+{
+  "version": "1.0-sprint1",
+  "generated": "2026-11-21",
+  "units": {
+    "distance": "km",
+    "time": "calendar months",
+    "miles_to_km": 1.609344
+  },
+  "state_thresholds": {
+    "approaching_ratio": 0.8,
+    "overdue_ratio": 1
+  },
+  "sources": {
+    "S1": {
+      "title": "Toyota 2025 Corolla (US petrol sedan), maintenance charts and footnotes, pp. 36–43",
+      "url": "https://www.toyota.com/content/dam/toyota/brochures/pdf/2025/T-MMS-25Corolla.pdf",
+      "accessed": "2026-11-21"
+    },
+    "S2": {
+      "title": "Toyota 2023 Corolla (US petrol sedan), maintenance log, pp. 36–53",
+      "url": "https://www.toyota.com/content/dam/toyota/brochures/pdf/2023/T-MMS-23Corolla.pdf",
+      "accessed": "2026-11-21"
+    },
+    "S3": {
+      "title": "Toyota 2025 Camry (US hybrid), maintenance log and footnotes, pp. 40–45",
+      "url": "https://www.toyota.com/content/dam/toyota/brochures/pdf/2025/T-MMS-25Camry.pdf",
+      "accessed": "2026-11-21"
+    },
+    "S4": {
+      "title": "Toyota 2023 Camry (US petrol), maintenance log, pp. 36–53",
+      "url": "https://www.toyota.com/content/dam/toyota/brochures/pdf/2023/T-MMS-23Camry.pdf",
+      "accessed": "2026-11-21"
+    },
+    "S5": {
+      "title": "Honda Canada Maintenance Minder A/0, codes A/0, 2 and 7 and exceptional-use notes",
+      "url": "https://www.honda.ca/-/media/Brands/Honda/Maintenance-Schedule/PDF/Maintenance-Minder-A0-Schedule---ENG.pdf?rev=7ee34cf6ecf34e3c8fe343b7a090eab2",
+      "accessed": "2026-11-21"
+    },
+    "S6": {
+      "title": "Toyota 2024 Corolla (US petrol sedan), maintenance log, pp. 36–53",
+      "url": "https://www.toyota.com/content/dam/toyota/brochures/pdf/2024/T-MMS-24Corolla.pdf",
+      "accessed": "2026-11-21"
+    },
+    "S7": {
+      "title": "Toyota 2024 Camry (US petrol), maintenance log, pp. 36–53",
+      "url": "https://www.toyota.com/content/dam/toyota/brochures/pdf/2024/T-MMS-24Camry.pdf",
+      "accessed": "2026-11-21"
+    },
+    "S8": {
+      "title": "Honda Canada Maintenance Minder vehicle applicability",
+      "url": "https://www.honda.ca/en/service-parts/maintenance-schedules",
+      "accessed": "2026-11-21"
+    },
+    "S9": {
+      "title": "Toyota/CFAO Ghana periodic maintenance service information",
+      "url": "https://toyotacfao.com/gh/en/periodic-maintenance",
+      "accessed": "2026-11-21"
+    }
+  },
+  "rules": [
+    {
+      "rule_id": "R01",
+      "make": "Toyota",
+      "model": "Corolla",
+      "service_type": "engine_oil_and_filter",
+      "label": "Replace engine oil and filter",
+      "condition": "normal_recommended_oil",
+      "source_miles": 10000,
+      "interval_km": 16093,
+      "interval_months": 12,
+      "applicability": [
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2023,
+          "year_to": 2023,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2024,
+          "year_to": 2024,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "anchor": "last_completed_service",
+      "verified": true,
+      "notes": "Normal operation with the guide-specified oil at the last service. Follow an earlier applicable dashboard prompt."
+    },
+    {
+      "rule_id": "R02",
+      "make": "Toyota",
+      "model": "Corolla",
+      "service_type": "engine_oil_and_filter",
+      "label": "Replace engine oil and filter",
+      "condition": "primarily_dirt_or_dusty",
+      "source_miles": 5000,
+      "interval_km": 8047,
+      "interval_months": 6,
+      "applicability": [
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2023,
+          "year_to": 2023,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2024,
+          "year_to": 2024,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "anchor": "last_completed_service",
+      "verified": true,
+      "notes": "Applies when driven primarily on dirt or dusty roads. Other special-use conditions require checking the exact guide."
+    },
+    {
+      "rule_id": "R03",
+      "make": "Toyota",
+      "model": "Corolla",
+      "service_type": "tyre_rotation",
+      "label": "Rotate tyres",
+      "condition": "base_schedule",
+      "source_miles": 5000,
+      "interval_km": 8047,
+      "interval_months": 6,
+      "applicability": [
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2023,
+          "year_to": 2023,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2024,
+          "year_to": 2024,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "anchor": "last_completed_service",
+      "verified": true,
+      "notes": "Use the applicable rotation pattern for the vehicle's tyres."
+    },
+    {
+      "rule_id": "R04",
+      "make": "Toyota",
+      "model": "Corolla",
+      "service_type": "brake_inspection",
+      "label": "Inspect brakes visually",
+      "condition": "base_schedule",
+      "source_miles": 5000,
+      "interval_km": 8047,
+      "interval_months": 6,
+      "applicability": [
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2023,
+          "year_to": 2023,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2024,
+          "year_to": 2024,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "anchor": "last_completed_service",
+      "verified": true,
+      "notes": "Visual check of pads/discs and linings/drums as equipped. A more detailed inspection is separately scheduled."
+    },
+    {
+      "rule_id": "R05",
+      "make": "Toyota",
+      "model": "Corolla",
+      "service_type": "cabin_air_filter",
+      "label": "Replace cabin air filter",
+      "condition": "normal",
+      "source_miles": 30000,
+      "interval_km": 48280,
+      "interval_months": 36,
+      "applicability": [
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2023,
+          "year_to": 2023,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2024,
+          "year_to": 2024,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "catalogue_id": "V03",
+          "market": "US",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "anchor": "last_completed_service",
+      "verified": true,
+      "notes": "Dust, heavy traffic and similar exposure can call for earlier replacement. Unknown if shortened interval is needed."
+    },
+    {
+      "rule_id": "R07",
+      "make": "Toyota",
+      "model": "Camry",
+      "service_type": "engine_oil_and_filter",
+      "label": "Replace engine oil and filter",
+      "condition": "normal_recommended_oil",
+      "source_miles": 10000,
+      "interval_km": 16093,
+      "interval_months": 12,
+      "applicability": [
+        {
+          "catalogue_id": "V05",
+          "market": "US",
+          "year_from": 2023,
+          "year_to": 2023,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S4"
+          ]
+        },
+        {
+          "catalogue_id": "V05",
+          "market": "US",
+          "year_from": 2024,
+          "year_to": 2024,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S7"
+          ]
+        },
+        {
+          "catalogue_id": "V06",
+          "market": "US",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "hybrid",
+          "body_style": "sedan",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "anchor": "last_completed_service",
+      "verified": true,
+      "notes": "Normal use with the engine-specific recommended oil. Follow an earlier applicable dashboard prompt."
+    },
+    {
+      "rule_id": "R08",
+      "make": "Toyota",
+      "model": "Camry",
+      "service_type": "cabin_air_filter",
+      "label": "Replace cabin air filter",
+      "condition": "normal",
+      "source_miles": 10000,
+      "interval_km": 16093,
+      "interval_months": 12,
+      "applicability": [
+        {
+          "catalogue_id": "V05",
+          "market": "US",
+          "year_from": 2023,
+          "year_to": 2023,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S4"
+          ]
+        },
+        {
+          "catalogue_id": "V05",
+          "market": "US",
+          "year_from": 2024,
+          "year_to": 2024,
+          "powertrain": "petrol",
+          "body_style": "sedan",
+          "source_ids": [
+            "S7"
+          ]
+        },
+        {
+          "catalogue_id": "V06",
+          "market": "US",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "hybrid",
+          "body_style": "sedan",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "anchor": "last_completed_service",
+      "verified": true,
+      "notes": "Dust, heavy traffic and similar exposure may warrant earlier replacement. Check the manual and filter condition."
+    },
+    {
+      "rule_id": "R09",
+      "make": "Honda",
+      "model": "CR-V",
+      "service_type": "engine_oil",
+      "label": "Replace engine oil",
+      "condition": "minder_fallback",
+      "source_miles": null,
+      "interval_km": null,
+      "interval_months": 12,
+      "applicability": [
+        {
+          "catalogue_id": "V08",
+          "market": "CA",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "petrol",
+          "body_style": "suv",
+          "source_ids": [
+            "S5",
+            "S8"
+          ]
+        },
+        {
+          "catalogue_id": "V08",
+          "market": "CA",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "hybrid",
+          "body_style": "suv",
+          "source_ids": [
+            "S5",
+            "S8"
+          ]
+        }
+      ],
+      "anchor": "last_confirmed_oil_service_and_minder_reset",
+      "verified": true,
+      "notes": "Yearly fallback when the Minder has not called for oil. Follow earlier oil prompts and any filter instruction shown."
+    },
+    {
+      "rule_id": "R10",
+      "make": "Honda",
+      "model": "CR-V",
+      "service_type": "engine_and_cabin_air_filter",
+      "label": "Replace engine and cabin air filters",
+      "condition": "regular_dusty_gravel_or_visible_soot",
+      "source_miles": null,
+      "interval_km": 24000,
+      "interval_months": null,
+      "applicability": [
+        {
+          "catalogue_id": "V08",
+          "market": "CA",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "petrol",
+          "body_style": "suv",
+          "source_ids": [
+            "S5",
+            "S8"
+          ]
+        },
+        {
+          "catalogue_id": "V08",
+          "market": "CA",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "hybrid",
+          "body_style": "suv",
+          "source_ids": [
+            "S5",
+            "S8"
+          ]
+        }
+      ],
+      "anchor": "last_completed_service",
+      "verified": true,
+      "notes": "Canadian exceptional-use interval. Track each filter's actual replacement mileage. Show combined guidance and report each filter separately."
+    },
+    {
+      "rule_id": "R11",
+      "make": "Honda",
+      "model": "CR-V",
+      "service_type": "brake_fluid",
+      "label": "Replace brake fluid",
+      "condition": "minder_fallback",
+      "source_miles": null,
+      "interval_km": null,
+      "interval_months": 36,
+      "applicability": [
+        {
+          "catalogue_id": "V08",
+          "market": "CA",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "petrol",
+          "body_style": "suv",
+          "source_ids": [
+            "S5",
+            "S8"
+          ]
+        },
+        {
+          "catalogue_id": "V08",
+          "market": "CA",
+          "year_from": 2025,
+          "year_to": 2025,
+          "powertrain": "hybrid",
+          "body_style": "suv",
+          "source_ids": [
+            "S5",
+            "S8"
+          ]
+        }
+      ],
+      "anchor": "last_completed_service",
+      "verified": true,
+      "notes": "Brake fluid fallback when item 7 has not appeared within 36 months of the last confirmed brake fluid service. Follow an earlier item 7."
+    }
+  ],
+  "retired_rule_ids": {
+    "R06": "Draft coolant rule retired. A first-fill milestone and repeat service need distinct anchors."
+  }
+}
