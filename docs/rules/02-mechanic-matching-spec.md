@@ -18,7 +18,7 @@ Return `assessed`, `not_assessed`, `suggest_radius_km`, `origin_precision` and `
 
 ## Reminder to search mapping
 
-A reminder card's "Find a mechanic" action searches the category below for the rule's `service_type`. Draft: the two filter rows have no exact category and need confirmation by Germain and Isaac before the search link ships.
+A reminder card's "Find a mechanic" action searches the category below for the rule's `service_type`. A row marked **disabled** has no search link.
 
 | Rule `service_type` | Rules | Search `service` |
 |---|---|---|
@@ -27,8 +27,10 @@ A reminder card's "Find a mechanic" action searches the category below for the r
 | `tyre_rotation` | R03 | `tyre_service` |
 | `brake_inspection` | R04 | `brake_service` |
 | `brake_fluid` | R11 | `brake_service` |
-| `cabin_air_filter` | R05, R08 | `air_conditioning` (to confirm) |
-| `engine_and_cabin_air_filter` | R10 | `oil_service` (to confirm) |
+| `cabin_air_filter` | R05, R08 | **disabled** |
+| `engine_and_cabin_air_filter` | R10 | **disabled** |
+
+The two air-filter search links are disabled. No service category records that a mechanic handles the specific filter replacement, and pointing drivers to a broader category such as `air_conditioning` or `oil_service` would imply an assessment the platform does not hold. For these rules the reminder card still shows its state, threshold and source, but it shows no "Find a mechanic" action and the API returns no search `service` for them. Enable a link only after a category or per-service assessment confirms that the mechanic handles that filter replacement, and update this table in the same change.
 
 ## Fixture examples and expected order
 
