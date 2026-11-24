@@ -60,6 +60,13 @@ Branching (`main` ← `staging` ← `dev` ← `feat/<issue>-...`), conventional 
 | [Data schema (ER diagram)](docs/data/) | Sprint 1, in progress |
 | [API contract v1](docs/api/) | Sprint 1, in progress |
 | [Testing strategy](docs/testing.md) | Sprint 1, in progress |
+| [Intelligence and quality package (index)](docs/README.md) | ✅ Sprint 1 |
+| [Reminder rule spec](docs/rules/01-reminder-rule-spec.md) | ✅ Sprint 1 |
+| [Mechanic matching spec](docs/rules/02-mechanic-matching-spec.md) | ✅ Sprint 1 |
+| [Test plan outline](docs/test/03-test-plan-outline.md) | ✅ Sprint 1 |
+| [Availability and reliability formulas](docs/test/05-availability-reliability.md) | ✅ Sprint 1 |
+| [Risk register v1](docs/risk/04-risk-register-v1.md) ([CSV](docs/risk/risk-register-v1.csv)) | ✅ Sprint 1 |
+| [Seed data: vehicles, rules, mechanics](data/seed/) | ✅ Sprint 1 |
 | [Source material](docs/source/) | Brief and proposal |
 
 ## Repo layout
