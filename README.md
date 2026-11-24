@@ -40,7 +40,7 @@ Other targets:
 ```bash
 make test   # backend pytest (skips @pending) + frontend Vitest
 make lint   # ruff + ESLint + TypeScript type-check
-make seed   # create the SQLite DB and load /data/seed (coming in Sprint 1)
+make seed   # create the SQLite DB and load data/seed (safe to re-run)
 ```
 
 Backend config comes from environment variables. See [backend/.env.example](backend/.env.example).

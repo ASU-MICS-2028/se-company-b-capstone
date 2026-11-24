@@ -30,4 +30,4 @@ lint: install
 	cd frontend && npm run lint && npm run typecheck
 
 seed: $(BIN)/activate
-	@echo "Seed loader not implemented yet (Sprint 1, step 6)."
+	cd backend && .venv/bin/python -m app.seed
