@@ -70,7 +70,7 @@ class Listing:
 class Origin:
     lat: float
     lng: float
-    precision: str  # "neighbourhood" | "coordinates"
+    precision: str  # "neighbourhood" | "device" (API contract #68)
 
 
 # --- Output -----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ def resolve_neighbourhood(name: str, neighbourhoods: Iterable[Neighbourhood]) ->
         if _normalise(n.name) == wanted:
             return n
     suggestions = tuple(n.name for n in known if wanted and wanted[:3] in _normalise(n.name))
-    raise MatchingError("unsupported_neighbourhood", f"Unsupported neighbourhood: {name!r}",
+    raise MatchingError("unknown_neighbourhood", f"Unknown neighbourhood: {name!r}",
                         suggestions or tuple(n.name for n in known))
 
 
@@ -158,7 +158,7 @@ def coordinates_origin(lat: float, lng: float) -> Origin:
         -90 <= lat <= 90 and -180 <= lng <= 180
     ):
         raise MatchingError("invalid_coordinates", "Latitude or longitude out of range")
-    return Origin(lat, lng, "coordinates")
+    return Origin(lat, lng, "device")
 
 
 def neighbourhood_origin(name: str, neighbourhoods: Iterable[Neighbourhood]) -> Origin:

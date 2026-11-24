@@ -116,7 +116,7 @@ def _north(km):
 
 def _search_at_origin(seed, listings, radius=10, now=None, **kw):
     return search(
-        listings, seed.categories, service="brake_service", origin=Origin(0.0, 0.0, "coordinates"),
+        listings, seed.categories, service="brake_service", origin=Origin(0.0, 0.0, "device"),
         radius_km=radius, now=now or seed.reference_time, demo_mode=True, **kw,
     )
 
@@ -231,7 +231,7 @@ def test_neighbourhood_resolution_normalises(seed, name):
     [
         ({"service": "ev_high_voltage"}, "unsupported_service"),  # MT-08, searchable false
         ({"service": "brake_service", "radius": 15}, "invalid_radius"),
-        ({"service": "brake_service", "area": "Nkawkaw"}, "unsupported_neighbourhood"),  # MT-10
+        ({"service": "brake_service", "area": "Nkawkaw"}, "unknown_neighbourhood"),  # MT-10
     ],
 )
 def test_rejections(seed, kwargs, code):
@@ -246,3 +246,7 @@ def test_invalid_coordinates(lat, lng):
     with pytest.raises(MatchingError) as e:
         coordinates_origin(lat, lng)
     assert e.value.code == "invalid_coordinates"
+
+
+def test_device_origin_precision_matches_contract():
+    assert coordinates_origin(5.556, -0.182).precision == "device"
