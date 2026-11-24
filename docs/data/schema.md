@@ -19,10 +19,14 @@ erDiagram
   neighbourhoods ||--o{ mechanics : "located in"
   mechanics ||--o{ mechanic_services : offers
   service_categories ||--o{ mechanic_services : "is"
+  mechanics ||--o{ mechanic_changes : "audited by"
+  mechanics ||--o{ complaints : receives
+  users |o--o{ mechanic_changes : "made by"
 
   users {
     int id PK
-    string email UK
+    string email UK "nullable"
+    string phone UK "nullable; email or phone required"
     string password_hash
     string full_name
     string role "driver|mechanic|admin"
@@ -139,6 +143,27 @@ erDiagram
     string mechanic_id PK,FK
     string category_id PK,FK
     string verification "assessed|self_reported|pending"
+    string assessor "required if assessed"
+    date assessed_on "required if assessed"
+  }
+  mechanic_changes {
+    int id PK
+    string mechanic_id FK
+    int actor_id FK
+    string field
+    string old_value
+    string new_value
+    datetime changed_at
+  }
+  complaints {
+    int id PK
+    string mechanic_id FK
+    int recorded_by FK
+    string description
+    string mechanic_response
+    string status "open|dismissed|upheld"
+    datetime created_at
+    datetime resolved_at
   }
 ```
 
@@ -146,7 +171,7 @@ erDiagram
 
 | Table | Module | Purpose |
 |---|---|---|
-| `users` | auth | Accounts with role `driver`, `mechanic` or `admin` (#49). Passwords are stored only as a hash. |
+| `users` | auth | Accounts with role `driver`, `mechanic` or `admin` (#49). Sign up with email **or** phone (US-01): both are unique, and a CHECK requires at least one. Passwords are stored only as a hash. |
 | `vehicle_models` | vehicles | Curated catalogue (`vehicles.json`). A catalogue hit helps data entry. It does **not** enable reminders by itself. |
 | `vehicles` | vehicles | An owner's car. `catalogue_id` is optional so unlisted cars (for example an Almera) can be entered manually. `source_market`, `body_style`, `powertrain` and `model_year` are what rule applicability matches on. Unknowns are stored explicitly, never guessed. |
 | `odometer_readings` | service_logs | Timestamped readings. The engine treats a reading older than 30 days, or taken before the anchor service, as unknown distance. Rollback is rejected on write. `source` allows OBD-II later. |
@@ -158,7 +183,9 @@ erDiagram
 | `service_categories` | mechanics | Mechanic search vocabulary. `ev_high_voltage` has `searchable = false`. |
 | `neighbourhoods` | mechanics | Named search origins with approximate centroids. |
 | `mechanics` | mechanics | Listing with overall assessment (status, date, assessor, basis), last reported availability (freshness is decided at query time, 24 h), `service_radius_km`, demo and published flags, and `suspension_reason`. |
-| `mechanic_services` | mechanics | Per-service verification. An assessed mechanic can still have a self-reported skill (M01 diagnostics). |
+| `mechanic_services` | mechanics | Per-service verification. An assessed mechanic can still have a self-reported skill (M01 diagnostics). `assessor` and `assessed_on` are required when a service is marked assessed (US-12), enforced in the admin service. |
+| `mechanic_changes` | mechanics | Audit log of every assessment, availability and suspension edit: who, which field, old and new value, when (US-12, US-13, MT-14). |
+| `complaints` | mechanics | Complaint about a mechanic plus the mechanic's response and outcome (US-14). An upheld complaint usually goes with `mechanics.assessment_status = suspended`, which removes the listing from search at once. |
 
 ## Seed field mapping (#35)
 
@@ -182,6 +209,5 @@ Checked by loading the Sprint 1 seed package into these models: every record and
 
 ## Not in the schema yet
 
-- **Admin change history** for assessment, availability and suspension (MT-14). Add an audit table with the admin endpoints.
 - **Mapping between rule `service_type` and mechanic `service_categories`**, for example `engine_oil_and_filter` → `oil_service`, so a reminder can link to a mechanic search. TODO: confirm with G&I.
 - **Account deletion and retention policy** (AC-06).

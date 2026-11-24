@@ -39,3 +39,11 @@ def test_enum_columns_reject_unknown_values(session):
     session.add(User(email="x@example.com", password_hash="x", full_name="X", role="owner"))
     with pytest.raises(IntegrityError):
         session.commit()
+
+
+def test_user_needs_email_or_phone(session):
+    session.add(User(phone="+233200000000", password_hash="x", full_name="Kojo"))
+    session.commit()
+    session.add(User(password_hash="x", full_name="Nobody"))
+    with pytest.raises(IntegrityError):
+        session.commit()
