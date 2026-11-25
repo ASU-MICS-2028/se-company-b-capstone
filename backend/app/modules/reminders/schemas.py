@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -40,6 +40,10 @@ class ReminderOut(BaseModel):
     explanation: str
     sources: list[SourceOut]
     snoozed_until: date | None
+    search_service: str | None = Field(
+        examples=["oil_service"],
+        description="Category for 'Find a mechanic'; null = no link (air-filter rules)",
+    )
     help_link: Literal["manual", "mechanic_search"] | None = Field(
         description="Set when state is unknown (US-07)"
     )
@@ -68,3 +72,16 @@ class CompleteIn(BaseModel):
     confirm_lower: bool = False
     oil_meets_spec: bool | None = None
     minder_reset_on: date | None = None
+
+
+class MinderPromptIn(BaseModel):
+    """Driver reports an active Honda Maintenance Minder code (RT-15). Server sets reported_at."""
+
+    code: str = Field(min_length=1, max_length=10, examples=["7"])
+
+
+class MinderPromptOut(BaseModel):
+    id: int
+    code: str
+    reported_at: datetime
+    cleared_at: datetime | None

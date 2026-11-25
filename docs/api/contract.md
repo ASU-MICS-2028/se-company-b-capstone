@@ -7,7 +7,7 @@ Every route below exists in the backend as a **stub** with real request/response
 ## Conventions
 
 - **JSON**, `snake_case` keys, UTF-8.
-- **Dates** ISO 8601: `date` = `YYYY-MM-DD`; `datetime` = UTC with offset (`2026-11-23T06:00:00Z`). The reminder engine evaluates calendar dates in `Africa/Accra`.
+- **Dates** ISO 8601: `date` = `YYYY-MM-DD`; `datetime` = UTC with offset (`2026-11-23T06:00:00Z`). Datetimes sent without an offset are rejected. The reminder engine evaluates calendar dates in `Africa/Accra`.
 - **Distance** in kilometres. Decimals are JSON numbers; exact thresholds keep their fraction (`16093.44`).
 - **Auth:** `Authorization: Bearer <token>` from `/auth/login` or `/auth/register`. Roles: `driver`, `mechanic`, `admin`. *Stubbed until #49: the header is accepted but not checked.*
 - **Ownership:** a driver only ever sees their own vehicles. Another user's vehicle returns **404**, not 403, so IDs don't leak.
@@ -54,6 +54,9 @@ Every route below exists in the backend as a **stub** with real request/response
 | `GET` | `/api/v1/vehicles/{vehicle_id}/reminders` | Reminder view | owner | US-05, US-06, US-07 · Reminder view |
 | `POST` | `/api/v1/vehicles/{vehicle_id}/reminders/{rule_id}/snooze` | Snooze | owner | Reminder view |
 | `POST` | `/api/v1/vehicles/{vehicle_id}/reminders/{rule_id}/complete` | Mark done | owner | US-04, US-05 |
+| `GET` | `/api/v1/vehicles/{vehicle_id}/minder-prompts` | List Minder prompts | owner | RT-15 · Reminder view |
+| `POST` | `/api/v1/vehicles/{vehicle_id}/minder-prompts` | Report Minder prompt | owner | RT-15 · Reminder view |
+| `POST` | `/api/v1/vehicles/{vehicle_id}/minder-prompts/{prompt_id}/clear` | Clear Minder prompt | owner | RT-15 |
 | `GET` | `/api/v1/service-categories` | Service list | none | US-08 · Mechanic search |
 | `GET` | `/api/v1/neighbourhoods` | Neighbourhood list | none | US-08, US-09 |
 | `GET` | `/api/v1/mechanics/search` | Search | none | US-08, US-09, US-10 · Mechanic search |
@@ -73,7 +76,9 @@ Every route below exists in the backend as a **stub** with real request/response
 | rule `applicability[]` (market, years, powertrain, body style) | Matched against `VehicleIn` `source_market`, `model_year`, `powertrain`, `body_style`; result shown as `VehicleOut.reminder_support` and `VehicleReminders.schedule` |
 | rule `source_miles`, `interval_km`, `interval_months` (nullable) | `ReminderOut.interval_km` (exact), `interval_months`; null = dimension not used |
 | rule sources | `ReminderOut.sources[]` |
-| `condition_input_note` inputs | `VehicleIn.driving_condition`, `dusty_gravel_or_soot`, `last_oil_meets_spec`; `ServiceLogIn.oil_meets_spec`, `minder_reset_on` |
+| `condition_input_note` inputs | `VehicleIn.driving_condition`, `regular_dusty_gravel_or_visible_soot` (Honda R10), `last_oil_meets_spec`; `ServiceLogIn.oil_meets_spec`, `minder_reset_on` |
+| rule `search_service` (matching spec, "Reminder to search mapping") | `ReminderOut.search_service`, used as `service` for `/mechanics/search`; null = no "Find a mechanic" action |
+| Dashboard prompts (rule spec, RT-15) | `/vehicles/{vehicle_id}/minder-prompts` |
 | mechanic `services[].verification` | `SearchResult.service_verification`; profile `assessed_services` vs `other_services` |
 | `service_radius_km` | `MechanicProfile.service_radius_km` (filtering happens server-side) |
 | `availability_status`, `availability_updated_at` | `AvailabilityOut` (`status` effective after the 24 h rule, `reported_status`, `reported_at`) |
@@ -86,7 +91,7 @@ Every route below exists in the backend as a **stub** with real request/response
 ## Open questions
 
 - **Odometer rollback:** US-04 says "ask to confirm"; the rule spec says reject through the normal write path. The contract follows US-04 (`409` unless `confirm_lower: true`) and the engine treats confirmed-lower history as needing correction. *A&E + G&I to agree.*
-- **Reminder → mechanic search link:** needs a mapping from rule `service_type` (`engine_oil_and_filter`) to search `service` (`oil_service`). *G&I.*
+- **Air-filter search links:** R05, R08 and R10 have no `search_service` until a matching category exists. *Germain to confirm.*
 - **Snooze rules:** maximum length, and whether overdue cards can be snoozed. *A&E.*
 - **Phone format:** E.164 (`+233…`) assumed for sign-up. *A&E.*
 
@@ -241,7 +246,7 @@ Response:
       "body_style": "sedan",
       "source_market": "US",
       "driving_condition": "normal",
-      "dusty_gravel_or_soot": null,
+      "regular_dusty_gravel_or_visible_soot": null,
       "last_oil_meets_spec": true,
       "handbook_confirmed": true,
       "nickname": null,
@@ -290,7 +295,7 @@ Response:
   "body_style": "sedan",
   "source_market": "US",
   "driving_condition": "normal",
-  "dusty_gravel_or_soot": null,
+  "regular_dusty_gravel_or_visible_soot": null,
   "last_oil_meets_spec": true,
   "handbook_confirmed": true,
   "nickname": null,
@@ -322,7 +327,7 @@ Response:
   "body_style": "sedan",
   "source_market": "US",
   "driving_condition": "normal",
-  "dusty_gravel_or_soot": null,
+  "regular_dusty_gravel_or_visible_soot": null,
   "last_oil_meets_spec": true,
   "handbook_confirmed": true,
   "nickname": null,
@@ -362,7 +367,7 @@ Response:
   "body_style": "sedan",
   "source_market": "US",
   "driving_condition": "normal",
-  "dusty_gravel_or_soot": null,
+  "regular_dusty_gravel_or_visible_soot": null,
   "last_oil_meets_spec": true,
   "handbook_confirmed": true,
   "nickname": null,
@@ -556,6 +561,7 @@ Response:
         }
       ],
       "snoozed_until": null,
+      "search_service": "oil_service",
       "help_link": null
     }
   ]
@@ -610,6 +616,7 @@ Response:
     }
   ],
   "snoozed_until": "2026-12-01",
+  "search_service": "oil_service",
   "help_link": null
 }
 ```
@@ -662,7 +669,78 @@ Response:
     }
   ],
   "snoozed_until": null,
+  "search_service": "oil_service",
   "help_link": null
+}
+```
+
+### GET `/api/v1/vehicles/{vehicle_id}/minder-prompts` — List Minder prompts
+
+- **Purpose:** Driver-reported Honda Maintenance Minder codes, active and cleared, newest first.
+- **Auth:** owner
+- **Supports:** RT-15 · Reminder view
+- **Implemented in:** #44
+- **Success:** `200`
+- **Errors:** 404
+
+Response:
+
+```json
+[
+  {
+    "id": 1,
+    "code": "7",
+    "reported_at": "2026-11-24T08:00:00Z",
+    "cleared_at": null
+  }
+]
+```
+
+### POST `/api/v1/vehicles/{vehicle_id}/minder-prompts` — Report Minder prompt
+
+- **Purpose:** The dashboard is authoritative: the matching reminder card becomes due now with `trigger: dashboard`. Server sets `reported_at`.
+- **Auth:** owner
+- **Supports:** RT-15 · Reminder view
+- **Implemented in:** #44
+- **Success:** `201`
+- **Errors:** 400 `not_a_minder_vehicle` · 404 · 422
+
+Request:
+
+```json
+{
+  "code": "7"
+}
+```
+
+Response:
+
+```json
+{
+  "id": 1,
+  "code": "7",
+  "reported_at": "2026-11-24T08:00:00Z",
+  "cleared_at": null
+}
+```
+
+### POST `/api/v1/vehicles/{vehicle_id}/minder-prompts/{prompt_id}/clear` — Clear Minder prompt
+
+- **Purpose:** The prompt is gone from the dashboard (for example after the service and a Minder reset).
+- **Auth:** owner
+- **Supports:** RT-15
+- **Implemented in:** #44
+- **Success:** `200`
+- **Errors:** 404
+
+Response:
+
+```json
+{
+  "id": 1,
+  "code": "7",
+  "reported_at": "2026-11-24T08:00:00Z",
+  "cleared_at": "2026-11-25T08:00:00Z"
 }
 ```
 

@@ -1,6 +1,6 @@
 """Stub routes (contract v1). Real logic: reminders/engine.py (#44) + service layer."""
 
-from datetime import date
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 from fastapi import APIRouter, status
@@ -10,6 +10,8 @@ from app.core.errors import ERRORS
 from app.modules.reminders.schemas import (
     CompleteIn,
     LastService,
+    MinderPromptIn,
+    MinderPromptOut,
     ReminderOut,
     SnoozeIn,
     SourceOut,
@@ -42,8 +44,16 @@ _R01 = ReminderOut(
         )
     ],
     snoozed_until=None,
+    search_service="oil_service",
     help_link=None,
 )
+prompts = APIRouter(
+    prefix="/vehicles/{vehicle_id}/minder-prompts", tags=["reminders"], responses=ERRORS
+)
+_PROMPT = MinderPromptOut(
+    id=1, code="7", reported_at=datetime(2026, 11, 24, 8, tzinfo=UTC), cleared_at=None
+)
+
 _REMINDERS = VehicleReminders(
     vehicle_id=1, evaluated_on=date(2026, 11, 21), schedule="supported", reminders=[_R01]
 )
@@ -67,3 +77,22 @@ def complete_reminder(
 ) -> ReminderOut:
     """Logs the service and returns the re-evaluated card."""
     return _R01.model_copy(update={"state": "ok", "state_label": "Up to date"})
+
+
+@prompts.get("")
+def list_minder_prompts(vehicle_id: int, _: BearerToken) -> list[MinderPromptOut]:
+    """Active and cleared prompts, newest first."""
+    return [_PROMPT]
+
+
+@prompts.post("", status_code=status.HTTP_201_CREATED)
+def report_minder_prompt(vehicle_id: int, body: MinderPromptIn, _: BearerToken) -> MinderPromptOut:
+    """RT-15. The dashboard is authoritative: the matching card becomes due now, trigger
+    `dashboard`. 400 `not_a_minder_vehicle` for vehicles without Honda Minder rules."""
+    return _PROMPT
+
+
+@prompts.post("/{prompt_id}/clear")
+def clear_minder_prompt(vehicle_id: int, prompt_id: int, _: BearerToken) -> MinderPromptOut:
+    """Driver says the dashboard prompt is gone (e.g. after the service and a Minder reset)."""
+    return _PROMPT.model_copy(update={"cleared_at": datetime(2026, 11, 25, 8, tzinfo=UTC)})

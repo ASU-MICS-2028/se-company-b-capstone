@@ -33,7 +33,7 @@ class VehicleIn(BaseModel):
     body_style: BodyStyle = "unknown"
     source_market: SourceMarket = "UNKNOWN"
     driving_condition: DrivingCondition = "unknown"
-    dusty_gravel_or_soot: bool | None = None
+    regular_dusty_gravel_or_visible_soot: bool | None = None
     last_oil_meets_spec: bool | None = None
     handbook_confirmed: bool = False
     nickname: str | None = Field(None, max_length=40)
@@ -46,7 +46,7 @@ class VehiclePatch(BaseModel):
     body_style: BodyStyle | None = None
     source_market: SourceMarket | None = None
     driving_condition: DrivingCondition | None = None
-    dusty_gravel_or_soot: bool | None = None
+    regular_dusty_gravel_or_visible_soot: bool | None = None
     last_oil_meets_spec: bool | None = None
     handbook_confirmed: bool | None = None
     nickname: str | None = Field(None, max_length=40)
@@ -62,7 +62,7 @@ class VehicleOut(BaseModel):
     body_style: BodyStyle
     source_market: SourceMarket
     driving_condition: DrivingCondition
-    dusty_gravel_or_soot: bool | None
+    regular_dusty_gravel_or_visible_soot: bool | None
     last_oil_meets_spec: bool | None
     handbook_confirmed: bool
     nickname: str | None

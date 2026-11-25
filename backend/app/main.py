@@ -11,6 +11,7 @@ from app.core.db import DbSession
 from app.modules.auth.router import router as auth_router
 from app.modules.mechanics.router import admin as admin_router
 from app.modules.mechanics.router import router as mechanics_router
+from app.modules.reminders.router import prompts as minder_prompts_router
 from app.modules.reminders.router import router as reminders_router
 from app.modules.service_logs.router import router as service_logs_router
 from app.modules.vehicles.router import router as vehicles_router
@@ -27,6 +28,7 @@ for r in (
     vehicles_router,
     service_logs_router,
     reminders_router,
+    minder_prompts_router,
     mechanics_router,
     admin_router,
 ):
