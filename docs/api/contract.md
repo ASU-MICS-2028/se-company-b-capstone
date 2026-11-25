@@ -789,7 +789,7 @@ Response:
 
 ### GET `/api/v1/mechanics/search` — Search
 
-- **Purpose:** Query: `service` (required), exactly one origin — `neighbourhood` **or** `lat`+`lng` — `radius_km` 10/20/40 (default 10), `include_unavailable` (default false). Filtering and ranking follow the matching spec (distance to 0.1 km, newest report, stable ID). `suggest_radius_km` set when `assessed` is empty below 40 km. Coordinates are never stored or logged.
+- **Purpose:** Query: `service` (required), exactly one origin — `neighbourhood` **or** `lat`+`lng` — `radius_km` 10/20/40 (default 10), `include_unavailable` (default false). Filtering and ranking follow the matching spec (distance to 0.1 km, newest report, stable ID). `suggest_radius_km` set when `assessed` is empty below 40 km. `hidden_unavailable` counts unavailable matches left out, for the "include unavailable" control. Coordinates are never stored or logged.
 - **Auth:** none
 - **Supports:** US-08, US-09, US-10 · Mechanic search
 - **Implemented in:** #45
@@ -822,6 +822,7 @@ Response:
   ],
   "not_assessed": [],
   "suggest_radius_km": null,
+  "hidden_unavailable": 1,
   "message": null
 }
 ```

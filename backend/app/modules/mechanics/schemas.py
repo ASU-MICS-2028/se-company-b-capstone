@@ -52,6 +52,10 @@ class SearchResponse(BaseModel):
     assessed: list[SearchResult]
     not_assessed: list[SearchResult] = Field(description="Collapsed section in the UI")
     suggest_radius_km: Literal[20, 40] | None = Field(description="Set when assessed is empty")
+    hidden_unavailable: int = Field(
+        0,
+        description="Unavailable matches left out; drives the include-unavailable control",
+    )
     message: str | None = Field(examples=["No assessed mechanics here yet"])
 
 

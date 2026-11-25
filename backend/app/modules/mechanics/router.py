@@ -115,6 +115,7 @@ def search_mechanics(
         assessed=[_M01_RESULT],
         not_assessed=[],
         suggest_radius_km=None,
+        hidden_unavailable=1,
         message=None,
     )
 
