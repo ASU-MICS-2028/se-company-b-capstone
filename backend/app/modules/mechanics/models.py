@@ -3,13 +3,14 @@ from datetime import date, datetime
 from sqlalchemy import ForeignKey, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.db import Base, choice
+from app.core.db import Base, UTCDateTime, choice
 
 ASSESSMENT_STATUSES = ("assessed", "pending", "self_reported", "suspended")
 SERVICE_VERIFICATIONS = ("assessed", "self_reported", "pending")
 AVAILABILITY_STATUSES = ("available", "busy", "unavailable")
 COMPLAINT_STATUSES = ("open", "dismissed", "upheld")
-CONTACT_MODES = ("demo_dialog", "phone")  # TODO: confirm live contact options with G&I
+# demo_dialog confirmed (G&I, #67); phone is the placeholder live option. TODO(A&E): decide.
+CONTACT_MODES = ("demo_dialog", "phone")
 
 
 class ServiceCategory(Base):
@@ -57,7 +58,7 @@ class Mechanic(Base):
     availability_status: Mapped[str | None] = mapped_column(
         choice("availability_status", *AVAILABILITY_STATUSES)
     )
-    availability_updated_at: Mapped[datetime | None]  # UTC
+    availability_updated_at: Mapped[datetime | None] = mapped_column(UTCDateTime)  # UTC
     contact_mode: Mapped[str] = mapped_column(choice("contact_mode", *CONTACT_MODES))
     test_purpose: Mapped[str | None] = mapped_column(String(300))  # fixture documentation only
 
@@ -92,7 +93,7 @@ class MechanicChange(Base):
     field: Mapped[str] = mapped_column(String(60))  # e.g. "services.brake_service.verification"
     old_value: Mapped[str | None] = mapped_column(String(500))
     new_value: Mapped[str | None] = mapped_column(String(500))
-    changed_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    changed_at: Mapped[datetime] = mapped_column(UTCDateTime, server_default=func.now())
 
 
 class Complaint(Base):
@@ -108,5 +109,5 @@ class Complaint(Base):
     status: Mapped[str] = mapped_column(
         choice("complaint_status", *COMPLAINT_STATUSES), default="open"
     )
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-    resolved_at: Mapped[datetime | None]
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, server_default=func.now())
+    resolved_at: Mapped[datetime | None] = mapped_column(UTCDateTime)

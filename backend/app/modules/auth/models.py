@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import CheckConstraint, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base, choice
+from app.core.db import Base, UTCDateTime, choice
 
 ROLES = ("driver", "mechanic", "admin")
 
@@ -22,4 +22,4 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     full_name: Mapped[str] = mapped_column(String(120))
     role: Mapped[str] = mapped_column(choice("user_role", *ROLES), default="driver")
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, server_default=func.now())

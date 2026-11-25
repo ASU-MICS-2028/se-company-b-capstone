@@ -1,8 +1,9 @@
 from collections.abc import Iterator
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy import Engine, create_engine, event
+from sqlalchemy import DateTime, Engine, TypeDecorator, create_engine, event
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
@@ -46,3 +47,24 @@ def create_all(bind: Engine = engine) -> None:
 def choice(name: str, *values: str) -> SAEnum:
     """String column limited to `values` by a CHECK constraint (portable, no native enum)."""
     return SAEnum(*values, name=name, native_enum=False, create_constraint=True, length=40)
+
+
+class UTCDateTime(TypeDecorator):
+    """Timezone-aware UTC datetimes on SQLite, which drops offsets (ADR-003).
+
+    Writes: aware datetimes are converted to UTC; naive ones are rejected.
+    Reads: UTC is re-attached, so comparisons with datetime.now(UTC) work.
+    """
+
+    impl = DateTime
+    cache_ok = True
+
+    def process_bind_param(self, value: datetime | None, dialect):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            raise ValueError("naive datetime; pass a timezone-aware value (UTC)")
+        return value.astimezone(UTC).replace(tzinfo=None)
+
+    def process_result_value(self, value: datetime | None, dialect):
+        return value.replace(tzinfo=UTC) if value is not None else None

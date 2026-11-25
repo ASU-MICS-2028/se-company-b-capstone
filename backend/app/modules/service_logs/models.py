@@ -4,12 +4,12 @@ from decimal import Decimal
 from sqlalchemy import ForeignKey, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base, choice
+from app.core.db import Base, UTCDateTime, choice
 
 ODOMETER_SOURCES = ("manual", "obd")  # OBD-II is future work; field exists so it can land later.
 
 # Service-history keys. R10 tracks engine and cabin air filters separately (rule spec).
-# TODO: confirm with G&I; and the mapping to mechanic service_categories.
+# Confirmed by G&I (#67). `engine_and_cabin_air_filter` is a rule service_type, not a key.
 SERVICE_KEYS = (
     "engine_oil_and_filter",
     "engine_oil",
@@ -32,11 +32,11 @@ class OdometerReading(Base):
         ForeignKey("vehicles.id", ondelete="CASCADE"), index=True
     )
     odometer_km: Mapped[Decimal] = mapped_column(Numeric(9, 1))
-    read_at: Mapped[datetime]  # UTC
+    read_at: Mapped[datetime] = mapped_column(UTCDateTime)  # UTC
     source: Mapped[str] = mapped_column(
         choice("odometer_source", *ODOMETER_SOURCES), default="manual"
     )
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, server_default=func.now())
 
 
 class ServiceLog(Base):
@@ -57,4 +57,4 @@ class ServiceLog(Base):
         date | None
     ]  # Honda Maintenance Minder reset linked to this service (R09)
     notes: Mapped[str | None] = mapped_column(String(500))
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, server_default=func.now())

@@ -47,3 +47,38 @@ def test_user_needs_email_or_phone(session):
     session.add(User(password_hash="x", full_name="Nobody"))
     with pytest.raises(IntegrityError):
         session.commit()
+
+
+def test_datetimes_round_trip_as_utc(session):
+    """SQLite drops offsets; UTCDateTime must hand back aware UTC (matching engine compares)."""
+    from datetime import UTC, datetime, timedelta, timezone
+
+    from app.models import OdometerReading
+
+    user = User(email="t@example.com", password_hash="x", full_name="T")
+    session.add(user)
+    session.flush()
+    car = _vehicle(owner_id=user.id)
+    session.add(car)
+    session.flush()
+    accra_plus_one = datetime(2026, 11, 23, 9, 0, tzinfo=timezone(timedelta(hours=1)))
+    session.add(OdometerReading(vehicle_id=car.id, odometer_km=48000, read_at=accra_plus_one))
+    session.commit()
+    session.expire_all()
+
+    reading = session.query(OdometerReading).one()
+    assert reading.read_at == datetime(2026, 11, 23, 8, 0, tzinfo=UTC)
+    assert reading.read_at.tzinfo is not None
+    assert session.get(User, user.id).created_at.tzinfo is not None  # server default too
+
+
+def test_naive_datetimes_are_rejected(session):
+    from datetime import datetime
+
+    from sqlalchemy.exc import StatementError
+
+    from app.models import OdometerReading
+
+    session.add(OdometerReading(vehicle_id=1, odometer_km=1, read_at=datetime(2026, 1, 1)))
+    with pytest.raises(StatementError, match="naive datetime"):
+        session.commit()

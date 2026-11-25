@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import JSON, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base, choice
+from app.core.db import Base, UTCDateTime, choice
 
 # Value lists from data/seed/vehicles.json (G&I, Sprint 1).
 POWERTRAINS = ("petrol", "diesel", "hybrid", "plug_in_hybrid", "electric")
@@ -46,11 +46,11 @@ class Vehicle(Base):
     driving_condition: Mapped[str] = mapped_column(
         choice("driving_condition", *DRIVING_CONDITIONS), default="unknown"
     )
-    # Honda R10 condition, recorded separately from driving_condition. None = unknown.
-    # TODO: confirm with G&I
-    dusty_gravel_or_soot: Mapped[bool | None]
+    # Honda R10 condition, recorded separately from driving_condition (confirmed by G&I, #67).
+    # Named after the rule condition it enables. None = unknown, which never activates R10.
+    regular_dusty_gravel_or_visible_soot: Mapped[bool | None]
     # Toyota R01/R07 guard: previous oil met the guide spec. None = unknown -> normal oil rule off.
     last_oil_meets_spec: Mapped[bool | None]
     handbook_confirmed: Mapped[bool] = mapped_column(default=False)
     nickname: Mapped[str | None] = mapped_column(String(40))
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, server_default=func.now())
