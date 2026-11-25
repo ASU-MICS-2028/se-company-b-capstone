@@ -122,8 +122,19 @@ def test_loads_and_is_idempotent(seed_dir, engine):
 
 
 def test_mechanics_only_in_demo_mode(seed_dir, engine):
-    assert "mechanics" not in load(seed_dir, engine, demo=False)
+    counts = load(seed_dir, engine, demo=False)
+    assert "mechanics" not in counts
+    assert counts["service_categories"] == 1  # reference data loads everywhere
     assert count(engine, Mechanic) == 0
+
+
+def test_rule_search_link_is_stored(seed_dir, engine):
+    rules = copy.deepcopy(RULES)
+    rules["rules"][0]["search_service"] = "brake_service"
+    (seed_dir / "maintenance_rules.json").write_text(json.dumps(rules))
+    load(seed_dir, engine, demo=False)
+    with Session(engine) as s:
+        assert s.get(ReminderRule, "R01").search_service == "brake_service"
 
 
 def broken(change):
@@ -151,8 +162,20 @@ def broken(change):
             lambda v, r, m: m["mechanics"][0].update(neighbourhood="Nkawkaw"),
             "unknown neighbourhood",
         ),
+        (lambda v, r, m: r["rules"][0].update(condition="dusty"), "unknown condition"),
+        (lambda v, r, m: r["rules"][0].update(search_service="oil"), "unknown search_service"),
     ],
-    ids=["source", "catalogue", "retired", "rounding", "overlap", "rule_ids", "neighbourhood"],
+    ids=[
+        "source",
+        "catalogue",
+        "retired",
+        "rounding",
+        "overlap",
+        "rule_ids",
+        "neighbourhood",
+        "condition",
+        "search_service",
+    ],
 )
 def test_validation_rejects(change, expected):
     assert any(expected in p for p in broken(change))

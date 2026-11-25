@@ -2,7 +2,7 @@
 
     python -m app.seed [--dir PATH] [--db URL]
 
-Order: catalogue -> sources -> rules -> (demo mode only) categories, neighbourhoods, mechanics.
+Order: catalogue -> sources -> categories, neighbourhoods -> rules -> (demo mode only) mechanics.
 Idempotent: reference rows are upserted, so re-running never touches user data.
 """
 
@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.db import create_all
 from app.modules.mechanics.models import Mechanic, MechanicService, Neighbourhood, ServiceCategory
-from app.modules.reminders.models import ReminderRule, RuleApplicability, Source
+from app.modules.reminders.models import RULE_CONDITIONS, ReminderRule, RuleApplicability, Source
 from app.modules.vehicles.models import VehicleModel
 
 DEFAULT_DIR = Path(__file__).resolve().parents[2] / "data" / "seed"
@@ -40,9 +40,10 @@ def exact_km(rule: dict) -> Decimal | None:
     return Decimal(str(rule["interval_km"])) if rule.get("interval_km") is not None else None
 
 
-def validate(vehicles: dict, rules: dict, mechanics: dict | None) -> list[str]:
+def validate(vehicles: dict, rules: dict, mechanics: dict, demo: bool = True) -> list[str]:
     """RT-18 import checks. Returns a list of problems (empty = OK)."""
     problems = []
+    cats = {c["id"] for c in mechanics["service_categories"]}
     catalogue = {v["catalogue_id"] for v in vehicles["vehicles"]}
     sources = set(rules["sources"])
     retired = set(rules.get("retired_rule_ids", {}))
@@ -60,6 +61,10 @@ def validate(vehicles: dict, rules: dict, mechanics: dict | None) -> list[str]:
         if rid in retired:
             problems.append(f"{rid}: is retired")
         seen_ids.add(rid)
+        if r["condition"] not in RULE_CONDITIONS:
+            problems.append(f"{rid}: unknown condition {r['condition']}")
+        if r.get("search_service") and r["search_service"] not in cats:
+            problems.append(f"{rid}: unknown search_service {r['search_service']}")
         if r.get("interval_km") is None and r.get("interval_months") is None:
             problems.append(f"{rid}: needs interval_km or interval_months")
         km = exact_km(r)
@@ -96,8 +101,7 @@ def validate(vehicles: dict, rules: dict, mechanics: dict | None) -> list[str]:
         if bool(derived[v["catalogue_id"]]) != v["rules_supported"]:
             problems.append(f"{v['catalogue_id']}: rules_supported disagrees with applicability")
 
-    if mechanics:
-        cats = {c["id"] for c in mechanics["service_categories"]}
+    if demo:
         areas = {n["name"] for n in mechanics["neighbourhoods"]}
         for m in mechanics["mechanics"]:
             if m["neighbourhood"] not in areas:
@@ -126,9 +130,9 @@ def load(seed_dir: Path = DEFAULT_DIR, engine: Engine | None = None, demo: bool 
     demo = get_settings().demo_mode if demo is None else demo
     read = lambda name: json.loads((seed_dir / name).read_text(encoding="utf-8"))  # noqa: E731
     vehicles, rules = read("vehicles.json"), read("maintenance_rules.json")
-    mechanics = read("mechanics.json") if demo else None
+    mechanics = read("mechanics.json")  # categories + neighbourhoods are always needed
 
-    problems = validate(vehicles, rules, mechanics)
+    problems = validate(vehicles, rules, mechanics, demo)
     if problems:
         raise SeedError(problems)
 
@@ -146,6 +150,10 @@ def load(seed_dir: Path = DEFAULT_DIR, engine: Engine | None = None, demo: bool 
                     accessed=_day(src["accessed"]),
                 )
             )
+        for c in mechanics["service_categories"]:
+            s.merge(ServiceCategory(**c))
+        for n in mechanics["neighbourhoods"]:
+            s.merge(Neighbourhood(**n))
         s.flush()
         s.execute(delete(RuleApplicability))  # rebuilt below; nothing user-owned points at it
         for r in rules["rules"]:
@@ -163,14 +171,11 @@ def load(seed_dir: Path = DEFAULT_DIR, engine: Engine | None = None, demo: bool 
             vehicle_models=len(vehicles["vehicles"]),
             rules=len(rules["rules"]),
             sources=len(rules["sources"]),
+            service_categories=len(mechanics["service_categories"]),
+            neighbourhoods=len(mechanics["neighbourhoods"]),
         )
 
-        if mechanics:
-            for c in mechanics["service_categories"]:
-                s.merge(ServiceCategory(**c))
-            for n in mechanics["neighbourhoods"]:
-                s.merge(Neighbourhood(**n))
-            s.flush()
+        if demo:
             for m in mechanics["mechanics"]:
                 fields = {k: m[k] for k in m if k != "services"}
                 fields["assessed_on"] = _day(fields.get("assessed_on"))

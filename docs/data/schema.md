@@ -1,8 +1,8 @@
 # Database schema (SQLite)
 
-SQLAlchemy models live in `backend/app/modules/<module>/models.py` (ADR-002, ADR-003). Tables are created by `create_all()` in `app/core/db.py`. Foreign keys are enforced (`PRAGMA foreign_keys=ON`). Value lists are enforced with CHECK constraints, so a bad enum value fails at the database.
+SQLAlchemy models live in `backend/app/modules/<module>/models.py` (ADR-002, ADR-003). Tables are created by `create_all()` in `app/core/db.py`. Foreign keys are enforced (`PRAGMA foreign_keys=ON`). Value lists are enforced with CHECK constraints, so a bad enum value fails at the database. All timestamps use `UTCDateTime` (`core/db.py`): they're stored as UTC and read back timezone-aware, and naive datetimes are rejected on write. SQLite would otherwise drop the offset.
 
-Fields marked **TODO: confirm with G&I** are guesses waiting for the rule and matching specs to be confirmed.
+Germain and Isaac confirmed the rule and matching fields on #67 and #72. The one remaining product decision (live `contact_mode` options) is marked `TODO(A&E)` in the code.
 
 ```mermaid
 erDiagram
@@ -12,6 +12,8 @@ erDiagram
   vehicles ||--o{ odometer_readings : has
   vehicles ||--o{ service_logs : has
   vehicles ||--o{ reminder_snoozes : has
+  vehicles ||--o{ minder_prompts : reports
+  service_categories |o--o{ reminder_rules : "search link"
   reminder_rules ||--|{ rule_applicability : "applies to"
   vehicle_models ||--o{ rule_applicability : "scoped by"
   rule_applicability }o--o{ sources : "cited by (rule_applicability_sources)"
@@ -52,7 +54,7 @@ erDiagram
     string body_style
     string source_market
     string driving_condition
-    bool dusty_gravel_or_soot "nullable"
+    bool regular_dusty_gravel_or_visible_soot "nullable"
     bool last_oil_meets_spec "nullable"
     bool handbook_confirmed
   }
@@ -85,6 +87,7 @@ erDiagram
     int interval_months "nullable"
     string anchor
     bool verified
+    string search_service FK "nullable"
   }
   rule_applicability {
     int id PK
@@ -101,6 +104,13 @@ erDiagram
     string title
     string url
     date accessed
+  }
+  minder_prompts {
+    int id PK
+    int vehicle_id FK
+    string code "A|0|2|7..."
+    datetime reported_at "UTC"
+    datetime cleared_at "null = active"
   }
   reminder_snoozes {
     int id PK
@@ -179,7 +189,8 @@ erDiagram
 | `reminder_rules` | reminders | One row per active rule (R06 is retired). `interval_km` is the **exact** threshold: Toyota rules store `source_miles × 1.609344` (16,093.44 km), not the rounded display value. A null interval means that dimension isn't used, which is different from "unknown". |
 | `rule_applicability` | reminders | Exact configurations a rule covers (market, year range, powertrain, body style, catalogue row). A rule fires only on an exact match. |
 | `sources`, `rule_applicability_sources` | reminders | Manufacturer documents cited by each applicability row, so every reminder can show its source. |
-| `reminder_snoozes` | reminders | The only stored reminder state. **Reminder states are computed on read** by `reminders/engine.py`. "Mark done" means logging a service. |
+| `minder_prompts` | reminders | Driver-reported Honda Maintenance Minder prompt (code, reported, cleared). The dashboard is authoritative: an active prompt makes its service due immediately (rule spec, RT-15). |
+| `reminder_snoozes` | reminders | The only stored reminder state besides Minder prompts. **Reminder states are computed on read** by `reminders/engine.py`. "Mark done" means logging a service. |
 | `service_categories` | mechanics | Mechanic search vocabulary. `ev_high_voltage` has `searchable = false`. |
 | `neighbourhoods` | mechanics | Named search origins with approximate centroids. |
 | `mechanics` | mechanics | Listing with overall assessment (status, date, assessor, basis), last reported availability (freshness is decided at query time, 24 h), `service_radius_km`, demo and published flags, and `suspension_reason`. |
@@ -195,7 +206,8 @@ Checked by loading the Sprint 1 seed package into these models: every record and
 |---|---|---|
 | `vehicles.json` `vehicles[]` | `vehicle_models.*` | `rule_ids` is **not stored**. It's derived from `rule_applicability`, and the loader checks the two agree. |
 | `vehicles.json` `*_values` lists | CHECK constraints on `vehicles` and `rule_applicability` | `POWERTRAINS`, `DRIVING_CONDITIONS`, `SOURCE_MARKETS`, `BODY_STYLES` in `vehicles/models.py` |
-| `vehicles.json` `condition_input_note` | `vehicles.dusty_gravel_or_soot`, `vehicles.last_oil_meets_spec`, `service_logs.oil_meets_spec` | TODO: confirm with G&I |
+| `vehicles.json` `condition_input_note` | `vehicles.regular_dusty_gravel_or_visible_soot` (R10, named after its condition), `vehicles.last_oil_meets_spec`, `service_logs.oil_meets_spec` | Confirmed by G&I (#67). Null = unknown, which never enables R10 or the normal oil rules. |
+| rule `search_service` (to be added to the seed) | `reminder_rules.search_service` | From the matching spec's "Reminder to search mapping". Null = no "Find a mechanic" link (air-filter rules R05, R08, R10). |
 | `maintenance_rules.json` `rules[]` | `reminder_rules.*` | `interval_km` recalculated from `source_miles` when present |
 | `rules[].applicability[]` | `rule_applicability.*` | `source_ids` → `rule_applicability_sources` |
 | `sources{}` | `sources.*` | |
@@ -211,11 +223,12 @@ Checked by loading the Sprint 1 seed package into these models: every record and
 
 `backend/app/seed.py` reads `data/seed/{vehicles,maintenance_rules,mechanics}.json` (G&I's format), **validates everything first**, then writes in one transaction. A rejected seed writes nothing.
 
-- **Order:** catalogue → sources → rules and applicability → categories, neighbourhoods, mechanics.
-- **Mechanics are fictional demo data.** They load only when `DEMO_MODE=true` (the default). Set it to `false` in production.
+- **Order:** catalogue → sources → service categories and neighbourhoods → rules and applicability → mechanics.
+- **Categories and neighbourhoods are reference data** and load in every environment, because rules link to categories through `search_service`. **Mechanics are fictional demo data** and load only when `DEMO_MODE=true` (the default). Set it to `false` in production.
 - **Idempotent:** reference rows are upserted, so re-running never touches users, vehicles or service logs.
 - **Import checks (RT-18):**
-  - every catalogue and source reference resolves
+  - every catalogue, source and `search_service` reference resolves
+  - rule `condition` is one of the known strategies
   - no retired rule IDs
   - each rule has at least one interval
   - the rounded `interval_km` equals the exact value from `source_miles`
@@ -227,7 +240,7 @@ Checked by loading the Sprint 1 seed package into these models: every record and
 
 Options: `python -m app.seed --dir PATH --db URL`.
 
-## Not in the schema yet
+## Known limits
 
-- **Mapping between rule `service_type` and mechanic `service_categories`**, for example `engine_oil_and_filter` → `oil_service`, so a reminder can link to a mechanic search. TODO: confirm with G&I.
+- **Real per-service assessments.** The seed only has an overall `assessor` and `assessed_on`, so the loader copies them onto each assessed service. That's fine for fictional data. Real profiles must record them per service through the admin endpoint (US-12).
 - **Account deletion and retention policy** (AC-06).
