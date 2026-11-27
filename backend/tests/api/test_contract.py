@@ -8,23 +8,20 @@ import re
 import pytest
 
 V = "/api/v1"
-CAR = {
-    "make": "Toyota",
-    "model": "Corolla",
-    "model_year": 2025,
-    "powertrain": "petrol",
-    "odometer_km": 48000,
-}
 # Routes with real logic and their own API tests (test_auth.py, ...).
-REAL = {("post", "/auth/register"), ("post", "/auth/login"), ("get", "/auth/me")}
+REAL = {
+    ("post", "/auth/register"),
+    ("post", "/auth/login"),
+    ("get", "/auth/me"),
+    ("get", "/vehicle-models"),
+    ("get", "/vehicles"),
+    ("post", "/vehicles"),
+    ("get", "/vehicles/1"),
+    ("patch", "/vehicles/1"),
+    ("delete", "/vehicles/1"),
+}
 
 ROUTES = [
-    ("get", "/vehicle-models", None, 200),
-    ("get", "/vehicles", None, 200),
-    ("post", "/vehicles", CAR, 201),
-    ("get", "/vehicles/1", None, 200),
-    ("patch", "/vehicles/1", {"nickname": "Blue"}, 200),
-    ("delete", "/vehicles/1", None, 204),
     ("get", "/vehicles/1/service-logs", None, 200),
     (
         "post",

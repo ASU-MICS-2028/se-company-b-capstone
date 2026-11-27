@@ -1,6 +1,6 @@
 """Create an admin or mechanic account (self sign-up only ever creates drivers).
 
-    python -m app.modules.auth.cli --name "Nkenten Admin" --email admin@example.com --role admin
+python -m app.modules.auth.cli --name "Nkenten Admin" --email admin@example.com --role admin
 """
 
 import argparse
