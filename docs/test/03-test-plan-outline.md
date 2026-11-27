@@ -40,6 +40,7 @@ Cover registration and manual entry, service logging, explainable reminders, mec
 - **MT-15** exercises denied location permission, partial or conflicting origins, unknown neighbourhood, unsupported radius, and coordinates near bounds. Confirm search coordinates are absent from storage and logs.
 - **MT-16** checks fixture profiles are limited to demo mode, have visible labels, and use a local contact simulation. Check that M01's assessment and diagnostics claim remain distinct on its profile.
 - **AC-01–06** check authentication, cross-account vehicle isolation for reads and writes, admin-only status updates, hashed passwords, input validation, and account deletion/retention behavior per the agreed policy.
+- **AT-US01-1 to AT-US04-3** are the browser acceptance cases for US-01, US-02 and US-04. See [acceptance cases](07-acceptance-cases.md).
 
 ## System, usability, and performance
 
