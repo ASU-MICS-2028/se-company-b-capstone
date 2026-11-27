@@ -46,7 +46,7 @@ class Mechanic(Base):
     neighbourhood: Mapped[str] = mapped_column(ForeignKey("neighbourhoods.name"))
     lat: Mapped[float]
     lng: Mapped[float]
-    service_radius_km: Mapped[float] = mapped_column(Numeric(5, 1))
+    service_radius_km: Mapped[float] = mapped_column(Numeric(5, 1, asdecimal=False))
     # Overall assessment
     assessment_status: Mapped[str] = mapped_column(
         choice("assessment_status", *ASSESSMENT_STATUSES)
