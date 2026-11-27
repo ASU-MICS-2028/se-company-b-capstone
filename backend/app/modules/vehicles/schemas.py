@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.core.types import Km
 
@@ -23,11 +23,25 @@ class VehicleModelOut(BaseModel):
 
 
 class VehicleIn(BaseModel):
-    """US-02. Omit catalogue_id for a manual (unlisted) vehicle."""
+    """US-02. Omit catalogue_id and the server matches make, model, year and powertrain against
+    the catalogue; no match = manual vehicle (`catalogue_id` null, reminders limited)."""
 
     catalogue_id: str | None = Field(None, examples=["V03"])
     make: str = Field(min_length=1, max_length=40, examples=["Toyota"])
     model: str = Field(min_length=1, max_length=40, examples=["Corolla"])
+
+    @field_validator("make", "model")
+    @classmethod
+    def _not_blank(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("must not be blank")
+        return v.strip()
+
+    @field_validator("nickname")
+    @classmethod
+    def _blank_nickname_is_none(cls, v: str | None) -> str | None:
+        return v.strip() or None if v else None
+
     model_year: int = Field(ge=1980, le=2100, examples=[2025])
     powertrain: Powertrain
     body_style: BodyStyle = "unknown"

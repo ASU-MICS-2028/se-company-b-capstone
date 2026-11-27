@@ -1,15 +1,15 @@
 # API contract v1
 
-**Status:** draft for team review (#11). Auth is implemented (#49). · **Base path:** `/api/v1` · **Live spec:** Swagger at http://localhost:8000/docs (OpenAPI at `/openapi.json`)
+**Status:** draft for team review (#11). Implemented: auth (#49), catalogue and vehicles (#50). · **Base path:** `/api/v1` · **Live spec:** Swagger at http://localhost:8000/docs (OpenAPI at `/openapi.json`)
 
-Apart from auth, every route below exists in the backend as a **stub** with real request/response schemas that returns example data. Real logic lands in the issue named per endpoint. Frontend work (#51) can build against the stubs now. The Pydantic schemas in `backend/app/modules/*/schemas.py` are the source of truth; if this page and Swagger disagree, Swagger wins and this page gets fixed.
+Apart from auth and vehicles, every route below exists in the backend as a **stub** with real request/response schemas that returns example data. Real logic lands in the issue named per endpoint. Frontend work (#51) can build against the stubs now. The Pydantic schemas in `backend/app/modules/*/schemas.py` are the source of truth; if this page and Swagger disagree, Swagger wins and this page gets fixed.
 
 ## Conventions
 
 - **JSON**, `snake_case` keys, UTF-8.
 - **Dates** ISO 8601: `date` = `YYYY-MM-DD`; `datetime` = UTC with offset (`2026-11-23T06:00:00Z`). Datetimes sent without an offset are rejected. The reminder engine evaluates calendar dates in `Africa/Accra`.
 - **Distance** in kilometres. Decimals are JSON numbers; exact thresholds keep their fraction (`16093.44`).
-- **Auth:** `Authorization: Bearer <token>` from `/auth/login` or `/auth/register`. Roles: `driver`, `mechanic`, `admin`. Auth endpoints are real (#49). The other routes are still stubs that accept the header without checking it, and each gets `CurrentUser` / `require_role(...)` when its logic lands.
+- **Auth:** `Authorization: Bearer <token>` from `/auth/login` or `/auth/register`. Roles: `driver`, `mechanic`, `admin`. Auth and vehicle endpoints are real (#49, #50). The other routes are still stubs that accept the header without checking it, and each gets `CurrentUser` / `require_role(...)` when its logic lands.
 - **Ownership:** a driver only ever sees their own vehicles. Another user's vehicle returns **404**, not 403, so IDs don't leak.
 - **Pagination** on growing lists: `?page=1&page_size=20` (max 100). Response:
 
@@ -195,10 +195,10 @@ Response:
 
 ### GET `/api/v1/vehicle-models` — List catalogue
 
-- **Purpose:** Picker for register-vehicle. Optional `make`, `model` filters. Not paginated (8 rows).
+- **Purpose:** Picker for register-vehicle. Optional case-insensitive `make`, `model` filters. Not paginated (8 rows).
 - **Auth:** none
 - **Supports:** US-02 · Register vehicle
-- **Implemented in:** #50
+- **Implemented in:** #50 (done)
 - **Success:** `200`
 - **Errors:** —
 
@@ -207,17 +207,16 @@ Response:
 ```json
 [
   {
-    "catalogue_id": "V03",
+    "catalogue_id": "V01",
     "make": "Toyota",
     "model": "Corolla",
-    "year_from": 2023,
-    "year_to": 2025,
+    "year_from": 2014,
+    "year_to": 2018,
     "powertrains": [
-      "petrol",
-      "hybrid"
+      "petrol"
     ],
-    "rules_supported": true,
-    "note": null
+    "rules_supported": false,
+    "note": "Catalogue entry only. Match an owner handbook before enabling a schedule."
   }
 ]
 ```
@@ -227,10 +226,10 @@ Response:
 
 ### GET `/api/v1/vehicles` — List my vehicles
 
-- **Purpose:** Caller's own vehicles only. Paginated.
+- **Purpose:** Caller's own vehicles only. Paginated. A new driver gets `items: []` (empty garage).
 - **Auth:** driver
 - **Supports:** US-01 (empty garage), US-02
-- **Implemented in:** #50
+- **Implemented in:** #50 (done)
 - **Success:** `200`
 - **Errors:** 401
 
@@ -255,7 +254,7 @@ Response:
       "nickname": null,
       "reminder_support": "supported",
       "latest_odometer_km": 48000.0,
-      "latest_odometer_at": "2026-11-21T09:00:00Z"
+      "latest_odometer_at": "2026-11-27T10:04:52.405236Z"
     }
   ],
   "page": 1,
@@ -266,12 +265,12 @@ Response:
 
 ### POST `/api/v1/vehicles` — Register vehicle
 
-- **Purpose:** Create a vehicle and its first odometer reading. Omit `catalogue_id` for manual entry; response `reminder_support: limited` drives the "reminders may be limited" message.
+- **Purpose:** Create a vehicle and its first odometer reading. Without `catalogue_id`, the server matches make + model + year + powertrain against the catalogue (case-insensitive) and stores the catalogue spelling; no match = manual car (`catalogue_id: null`). `reminder_support` is `supported` only when a rule's applicability matches the exact market, year, powertrain and body style; otherwise `limited`, which drives the "reminders may be limited" message.
 - **Auth:** driver
 - **Supports:** US-02, US-03 · Register vehicle
-- **Implemented in:** #50
+- **Implemented in:** #50 (done)
 - **Success:** `201`
-- **Errors:** 422 (negative/blank odometer, bad enum) · 400 `unknown_catalogue_id`
+- **Errors:** 401 · 422 (negative or missing odometer, blank make/model, bad enum) · 400 `unknown_catalogue_id`, `catalogue_mismatch` (explicit `catalogue_id` doesn't cover the car)
 
 Request:
 
@@ -281,6 +280,11 @@ Request:
   "model": "Corolla",
   "model_year": 2025,
   "powertrain": "petrol",
+  "body_style": "sedan",
+  "source_market": "US",
+  "driving_condition": "normal",
+  "last_oil_meets_spec": true,
+  "handbook_confirmed": true,
   "odometer_km": 48000
 }
 ```
@@ -304,7 +308,7 @@ Response:
   "nickname": null,
   "reminder_support": "supported",
   "latest_odometer_km": 48000.0,
-  "latest_odometer_at": "2026-11-21T09:00:00Z"
+  "latest_odometer_at": "2026-11-27T10:04:52.405236Z"
 }
 ```
 
@@ -313,9 +317,9 @@ Response:
 - **Purpose:** One vehicle.
 - **Auth:** owner
 - **Supports:** US-02
-- **Implemented in:** #50
+- **Implemented in:** #50 (done)
 - **Success:** `200`
-- **Errors:** 404 if missing **or** owned by someone else
+- **Errors:** 401 · 404 if missing **or** owned by someone else
 
 Response:
 
@@ -336,18 +340,18 @@ Response:
   "nickname": null,
   "reminder_support": "supported",
   "latest_odometer_km": 48000.0,
-  "latest_odometer_at": "2026-11-21T09:00:00Z"
+  "latest_odometer_at": "2026-11-27T10:04:52.405236Z"
 }
 ```
 
 ### PATCH `/api/v1/vehicles/{vehicle_id}` — Update vehicle
 
-- **Purpose:** Change configuration fields used by rule matching. Odometer goes through odometer-readings.
+- **Purpose:** Change configuration fields used by rule matching; `reminder_support` is recomputed. `null` for a required field (e.g. `body_style`) is ignored. Odometer goes through odometer-readings.
 - **Auth:** owner
 - **Supports:** US-02
-- **Implemented in:** #50
+- **Implemented in:** #50 (done)
 - **Success:** `200`
-- **Errors:** 404 · 422
+- **Errors:** 401 · 404 · 422
 
 Request:
 
@@ -373,21 +377,21 @@ Response:
   "regular_dusty_gravel_or_visible_soot": null,
   "last_oil_meets_spec": true,
   "handbook_confirmed": true,
-  "nickname": null,
+  "nickname": "Blue",
   "reminder_support": "supported",
   "latest_odometer_km": 48000.0,
-  "latest_odometer_at": "2026-11-21T09:00:00Z"
+  "latest_odometer_at": "2026-11-27T10:04:52.405236Z"
 }
 ```
 
 ### DELETE `/api/v1/vehicles/{vehicle_id}` — Delete vehicle
 
-- **Purpose:** Deletes the vehicle with its readings, logs and snoozes.
+- **Purpose:** Deletes the vehicle with its readings, logs, snoozes and Minder prompts.
 - **Auth:** owner
 - **Supports:** AC-06
-- **Implemented in:** #50
+- **Implemented in:** #50 (done)
 - **Success:** `204`
-- **Errors:** 404
+- **Errors:** 401 · 404
 
 
 ## Service logs and odometer
