@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from sqlalchemy import ForeignKey, Numeric, String, func
+from sqlalchemy import Float, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db import Base, UTCDateTime, choice
@@ -46,7 +46,7 @@ class Mechanic(Base):
     neighbourhood: Mapped[str] = mapped_column(ForeignKey("neighbourhoods.name"))
     lat: Mapped[float]
     lng: Mapped[float]
-    service_radius_km: Mapped[float] = mapped_column(Numeric(5, 1, asdecimal=False))
+    service_radius_km: Mapped[float] = mapped_column(Float)  # float maths in matching.py
     # Overall assessment
     assessment_status: Mapped[str] = mapped_column(
         choice("assessment_status", *ASSESSMENT_STATUSES)
