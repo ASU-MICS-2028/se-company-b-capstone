@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     app_env: str = "dev"
     database_url: str = "sqlite:///./autocare.db"
     cors_origins: list[str] = ["http://localhost:5173"]
+    # Fictional demo mechanics are loaded and served only when true (see .env.example).
+    demo_mode: bool = True
 
 
 @lru_cache

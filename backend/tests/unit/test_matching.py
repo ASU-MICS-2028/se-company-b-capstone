@@ -100,10 +100,19 @@ def test_mt11_osu_to_east_legon_about_9_2km(seed):
 
 def _listing(id="X01", lat=0.0, lng=0.0, radius=40.0, **kw):
     base = dict(
-        id=id, name=f"DEMO - {id}", neighbourhood="Test", lat=lat, lng=lng,
-        service_radius_km=radius, assessment_status="assessed", assessed_on="2026-11-01",
-        services={"brake_service": "assessed"}, availability_status="available",
-        availability_updated_at=None, is_demo=True, published=True,
+        id=id,
+        name=f"DEMO - {id}",
+        neighbourhood="Test",
+        lat=lat,
+        lng=lng,
+        service_radius_km=radius,
+        assessment_status="assessed",
+        assessed_on="2026-11-01",
+        services={"brake_service": "assessed"},
+        availability_status="available",
+        availability_updated_at=None,
+        is_demo=True,
+        published=True,
     )
     base.update(kw)
     return Listing(**base)
@@ -116,8 +125,14 @@ def _north(km):
 
 def _search_at_origin(seed, listings, radius=10, now=None, **kw):
     return search(
-        listings, seed.categories, service="brake_service", origin=Origin(0.0, 0.0, "device"),
-        radius_km=radius, now=now or seed.reference_time, demo_mode=True, **kw,
+        listings,
+        seed.categories,
+        service="brake_service",
+        origin=Origin(0.0, 0.0, "device"),
+        radius_km=radius,
+        now=now or seed.reference_time,
+        demo_mode=True,
+        **kw,
     )
 
 
@@ -187,8 +202,11 @@ def test_mt13_freshness(seed, age, status, expected, keeps_timestamp):
 
 def test_mt13_stale_unavailable_becomes_unknown_and_is_listed(seed):
     now = seed.reference_time
-    stale = _listing(lat=_north(1.0), availability_status="unavailable",
-                     availability_updated_at=now - timedelta(hours=30))
+    stale = _listing(
+        lat=_north(1.0),
+        availability_status="unavailable",
+        availability_updated_at=now - timedelta(hours=30),
+    )
     fresh = replace(stale, id="X02", availability_updated_at=now - timedelta(hours=2))
     r = _search_at_origin(seed, [stale, fresh])
     assert ids(r.assessed) == ["X01"]

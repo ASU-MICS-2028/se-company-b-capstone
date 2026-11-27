@@ -219,6 +219,27 @@ Checked by loading the Sprint 1 seed package into these models: every record and
 | `seed_reference_time` | not stored | Fixed clock for tests (DI, ADR-005) |
 | `version`, `generated`, `note`, `disclaimer` | not stored | |
 
+## Loading the seed (`make seed`)
+
+`backend/app/seed.py` reads `data/seed/{vehicles,maintenance_rules,mechanics}.json` (G&I's format), **validates everything first**, then writes in one transaction. A rejected seed writes nothing.
+
+- **Order:** catalogue → sources → service categories and neighbourhoods → rules and applicability → mechanics.
+- **Categories and neighbourhoods are reference data** and load in every environment, because rules link to categories through `search_service`. **Mechanics are fictional demo data** and load only when `DEMO_MODE=true` (the default, and what every environment uses in this course, including the final-demo production site). Seeding with `DEMO_MODE=false` also removes demo mechanics loaded earlier.
+- **Idempotent:** reference rows are upserted, so re-running never touches users, vehicles or service logs.
+- **Import checks (RT-18):**
+  - every catalogue, source and `search_service` reference resolves
+  - rule `condition` is one of the known strategies
+  - no retired rule IDs
+  - each rule has at least one interval
+  - the rounded `interval_km` equals the exact value from `source_miles`
+  - no two rules for the same vehicle, service and condition cover overlapping configurations
+  - catalogue `rule_ids` and `rules_supported` agree with applicability
+  - mechanic neighbourhoods and categories exist
+  - suspended listings are unpublished
+  - unit and threshold constants match the engine.
+
+Options: `python -m app.seed --dir PATH --db URL`.
+
 ## Known limits
 
 - **Real per-service assessments.** The seed only has an overall `assessor` and `assessed_on`, so the loader copies them onto each assessed service. That's fine for fictional data. Real profiles must record them per service through the admin endpoint (US-12).
