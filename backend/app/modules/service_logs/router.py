@@ -1,4 +1,4 @@
-"""Stub routes (contract v1). Real logic: #50."""
+"""Stub routes (contract v1). Real logic: #82 (service-log API)."""
 
 from datetime import UTC, date, datetime
 from decimal import Decimal

@@ -1,0 +1,426 @@
+{
+  "version": "1.0-sprint1",
+  "generated": "2026-11-21",
+  "disclaimer": "FICTIONAL DEMO DATA. These records represent fictional mechanics and approximate neighbourhood centres. The contact action is a local simulation and carries no phone number, email address, or outbound contact URL.",
+  "seed_reference_time": "2026-11-23T08:00:00Z",
+  "seed_reference_time_note": "Evaluate tests against this fixed UTC timestamp. For an interactive demo, shift all availability reports by the same offset only if the demo environment requires live-relative freshness.",
+  "service_categories": [
+    {
+      "id": "oil_service",
+      "label": "Oil and filter service",
+      "searchable": true
+    },
+    {
+      "id": "brake_service",
+      "label": "Brake inspection and repair",
+      "searchable": true
+    },
+    {
+      "id": "tyre_service",
+      "label": "Tyres, rotation and wheel alignment",
+      "searchable": true
+    },
+    {
+      "id": "battery_electrical",
+      "label": "Battery and electrical",
+      "searchable": true
+    },
+    {
+      "id": "air_conditioning",
+      "label": "Air conditioning",
+      "searchable": true
+    },
+    {
+      "id": "cooling_system",
+      "label": "Cooling system (radiator, coolant)",
+      "searchable": true
+    },
+    {
+      "id": "suspension_steering",
+      "label": "Suspension and steering",
+      "searchable": true
+    },
+    {
+      "id": "transmission",
+      "label": "Gearbox and transmission",
+      "searchable": true
+    },
+    {
+      "id": "diagnostics",
+      "label": "General diagnostics",
+      "searchable": true
+    },
+    {
+      "id": "ev_high_voltage",
+      "label": "Hybrid/EV high-voltage system",
+      "searchable": false,
+      "note": "Excluded from search in the prototype (proposal section 3)."
+    }
+  ],
+  "neighbourhoods": [
+    {
+      "name": "Osu",
+      "lat": 5.556,
+      "lng": -0.182
+    },
+    {
+      "name": "Labone",
+      "lat": 5.565,
+      "lng": -0.17
+    },
+    {
+      "name": "Airport Residential",
+      "lat": 5.605,
+      "lng": -0.177
+    },
+    {
+      "name": "East Legon",
+      "lat": 5.636,
+      "lng": -0.161
+    },
+    {
+      "name": "Madina",
+      "lat": 5.668,
+      "lng": -0.165
+    },
+    {
+      "name": "Adenta",
+      "lat": 5.707,
+      "lng": -0.163
+    },
+    {
+      "name": "Spintex",
+      "lat": 5.637,
+      "lng": -0.11
+    },
+    {
+      "name": "Achimota",
+      "lat": 5.614,
+      "lng": -0.233
+    },
+    {
+      "name": "Kaneshie",
+      "lat": 5.567,
+      "lng": -0.235
+    },
+    {
+      "name": "Dansoman",
+      "lat": 5.541,
+      "lng": -0.265
+    },
+    {
+      "name": "Tema Community 1",
+      "lat": 5.669,
+      "lng": -0.017
+    },
+    {
+      "name": "Kasoa",
+      "lat": 5.534,
+      "lng": -0.417
+    }
+  ],
+  "mechanics": [
+    {
+      "id": "M01",
+      "is_demo": true,
+      "name": "DEMO - Kojo Auto Works",
+      "neighbourhood": "Osu",
+      "lat": 5.556,
+      "lng": -0.182,
+      "service_radius_km": 10,
+      "assessment_status": "assessed",
+      "assessed_on": "2026-11-15",
+      "assessor": "Nkenten demo assessor (fictional)",
+      "services": [
+        {
+          "category": "oil_service",
+          "verification": "assessed"
+        },
+        {
+          "category": "brake_service",
+          "verification": "assessed"
+        },
+        {
+          "category": "tyre_service",
+          "verification": "assessed"
+        },
+        {
+          "category": "diagnostics",
+          "verification": "self_reported"
+        }
+      ],
+      "availability_status": "available",
+      "availability_updated_at": "2026-11-23T06:00:00Z",
+      "test_purpose": "Happy path. Kojo is the mechanic persona. Closest assessed brake mechanic to Ama in Osu or Labone.",
+      "contact_mode": "demo_dialog",
+      "published": true,
+      "assessment_basis": "Fictional sprint fixture. Example of a service-specific practical assessment."
+    },
+    {
+      "id": "M02",
+      "is_demo": true,
+      "name": "DEMO - Labone Brake & Tyre Centre",
+      "neighbourhood": "Labone",
+      "lat": 5.565,
+      "lng": -0.17,
+      "service_radius_km": 8,
+      "assessment_status": "assessed",
+      "assessed_on": "2026-11-16",
+      "services": [
+        {
+          "category": "brake_service",
+          "verification": "assessed"
+        },
+        {
+          "category": "tyre_service",
+          "verification": "assessed"
+        }
+      ],
+      "availability_status": "busy",
+      "availability_updated_at": "2026-11-23T07:30:00Z",
+      "test_purpose": "An assessed mechanic who is busy. Shown with a 'busy' label and never hidden only because of availability.",
+      "contact_mode": "demo_dialog",
+      "published": true,
+      "assessment_basis": "Fictional sprint fixture. Example of a service-specific practical assessment."
+    },
+    {
+      "id": "M03",
+      "is_demo": true,
+      "name": "DEMO - East Legon Motors",
+      "neighbourhood": "East Legon",
+      "lat": 5.636,
+      "lng": -0.161,
+      "service_radius_km": 12,
+      "assessment_status": "assessed",
+      "assessed_on": "2026-11-10",
+      "services": [
+        {
+          "category": "oil_service",
+          "verification": "assessed"
+        },
+        {
+          "category": "cooling_system",
+          "verification": "assessed"
+        },
+        {
+          "category": "transmission",
+          "verification": "assessed"
+        },
+        {
+          "category": "diagnostics",
+          "verification": "assessed"
+        }
+      ],
+      "availability_status": "available",
+      "availability_updated_at": "2026-11-20T09:00:00Z",
+      "test_purpose": "Stale availability: last updated more than 24h before the reference time, so it must show 'availability unknown'.",
+      "contact_mode": "demo_dialog",
+      "published": true,
+      "assessment_basis": "Fictional sprint fixture. Example of a service-specific practical assessment."
+    },
+    {
+      "id": "M04",
+      "is_demo": true,
+      "name": "DEMO - Madina Quick Service",
+      "neighbourhood": "Madina",
+      "lat": 5.668,
+      "lng": -0.165,
+      "service_radius_km": 10,
+      "assessment_status": "assessed",
+      "assessed_on": "2026-11-12",
+      "services": [
+        {
+          "category": "oil_service",
+          "verification": "assessed"
+        },
+        {
+          "category": "brake_service",
+          "verification": "assessed"
+        },
+        {
+          "category": "battery_electrical",
+          "verification": "assessed"
+        }
+      ],
+      "availability_status": "available",
+      "availability_updated_at": "2026-11-23T05:00:00Z",
+      "test_purpose": "Service-area rule: Osu is 12.6 km away, outside its 10 km service area, so it is excluded even in a 20 km search (E3). It ranks second for East Legon oil searches (E4).",
+      "contact_mode": "demo_dialog",
+      "published": true,
+      "assessment_basis": "Fictional sprint fixture. Example of a service-specific practical assessment."
+    },
+    {
+      "id": "M05",
+      "is_demo": true,
+      "name": "DEMO - Adenta Auto Electricals",
+      "neighbourhood": "Adenta",
+      "lat": 5.707,
+      "lng": -0.163,
+      "service_radius_km": 10,
+      "assessment_status": "pending",
+      "assessed_on": null,
+      "services": [
+        {
+          "category": "battery_electrical",
+          "verification": "self_reported"
+        },
+        {
+          "category": "air_conditioning",
+          "verification": "self_reported"
+        }
+      ],
+      "availability_status": "available",
+      "availability_updated_at": "2026-11-23T07:00:00Z",
+      "test_purpose": "Assessment pending, so not in the assessed results. It is the only air-conditioning provider, which gives the 'no assessed mechanic for this service' case.",
+      "contact_mode": "demo_dialog",
+      "published": true
+    },
+    {
+      "id": "M06",
+      "is_demo": true,
+      "name": "DEMO - Spintex Roadside Garage",
+      "neighbourhood": "Spintex",
+      "lat": 5.637,
+      "lng": -0.11,
+      "service_radius_km": 15,
+      "assessment_status": "self_reported",
+      "assessed_on": null,
+      "services": [
+        {
+          "category": "oil_service",
+          "verification": "self_reported"
+        },
+        {
+          "category": "brake_service",
+          "verification": "self_reported"
+        },
+        {
+          "category": "suspension_steering",
+          "verification": "self_reported"
+        }
+      ],
+      "availability_status": "available",
+      "availability_updated_at": "2026-11-23T07:45:00Z",
+      "test_purpose": "Self-reported only. Must appear in the separate 'Not yet assessed' section and never mix with assessed results.",
+      "contact_mode": "demo_dialog",
+      "published": true
+    },
+    {
+      "id": "M07",
+      "is_demo": true,
+      "name": "DEMO - Achimota Suspension Centre",
+      "neighbourhood": "Achimota",
+      "lat": 5.614,
+      "lng": -0.233,
+      "service_radius_km": 10,
+      "assessment_status": "assessed",
+      "assessed_on": "2026-11-14",
+      "services": [
+        {
+          "category": "suspension_steering",
+          "verification": "assessed"
+        },
+        {
+          "category": "brake_service",
+          "verification": "assessed"
+        }
+      ],
+      "availability_status": "unavailable",
+      "availability_updated_at": "2026-11-23T06:30:00Z",
+      "test_purpose": "Assessed but currently unavailable. Hidden by default and shown only when the driver ticks 'include unavailable'.",
+      "contact_mode": "demo_dialog",
+      "published": true,
+      "assessment_basis": "Fictional sprint fixture. Example of a service-specific practical assessment."
+    },
+    {
+      "id": "M08",
+      "is_demo": true,
+      "name": "DEMO - Dansoman Fitters",
+      "neighbourhood": "Dansoman",
+      "lat": 5.541,
+      "lng": -0.265,
+      "service_radius_km": 10,
+      "assessment_status": "suspended",
+      "assessed_on": "2026-11-05",
+      "suspension_reason": "Demo complaint under review",
+      "services": [
+        {
+          "category": "oil_service",
+          "verification": "assessed"
+        },
+        {
+          "category": "brake_service",
+          "verification": "assessed"
+        }
+      ],
+      "availability_status": "available",
+      "availability_updated_at": "2026-11-23T07:00:00Z",
+      "test_purpose": "Suspended, so it must never appear in any driver search. Only admins can see it.",
+      "contact_mode": "demo_dialog",
+      "published": false,
+      "assessment_basis": "Fictional sprint fixture. Example of a service-specific practical assessment."
+    },
+    {
+      "id": "M09",
+      "is_demo": true,
+      "name": "DEMO - Tema Hybrid Care",
+      "neighbourhood": "Tema Community 1",
+      "lat": 5.669,
+      "lng": -0.017,
+      "service_radius_km": 20,
+      "assessment_status": "assessed",
+      "assessed_on": "2026-11-11",
+      "services": [
+        {
+          "category": "oil_service",
+          "verification": "assessed"
+        },
+        {
+          "category": "cooling_system",
+          "verification": "assessed"
+        },
+        {
+          "category": "ev_high_voltage",
+          "verification": "self_reported"
+        }
+      ],
+      "availability_status": "available",
+      "availability_updated_at": "2026-11-23T04:00:00Z",
+      "test_purpose": "High-voltage claims are excluded from driver search. Standard assessed services remain subject to both radius filters.",
+      "contact_mode": "demo_dialog",
+      "published": true,
+      "assessment_basis": "Fictional sprint fixture. Example of a service-specific practical assessment."
+    },
+    {
+      "id": "M10",
+      "is_demo": true,
+      "name": "DEMO - Kasoa Tyre & Battery Assist",
+      "neighbourhood": "Kasoa",
+      "lat": 5.534,
+      "lng": -0.417,
+      "service_radius_km": 30,
+      "assessment_status": "assessed",
+      "assessed_on": "2026-11-13",
+      "services": [
+        {
+          "category": "tyre_service",
+          "verification": "assessed"
+        },
+        {
+          "category": "battery_electrical",
+          "verification": "assessed"
+        },
+        {
+          "category": "diagnostics",
+          "verification": "assessed"
+        }
+      ],
+      "availability_status": "available",
+      "availability_updated_at": "2026-11-23T07:50:00Z",
+      "test_purpose": "Only found from Osu after the search radius is widened (about 26 km away). Its large service_radius tests the service-area rule.",
+      "contact_mode": "demo_dialog",
+      "published": true,
+      "assessment_basis": "Fictional sprint fixture. Example of a service-specific practical assessment."
+    }
+  ]
+}

@@ -61,8 +61,8 @@ def test_datetimes_round_trip_as_utc(session):
     car = _vehicle(owner_id=user.id)
     session.add(car)
     session.flush()
-    accra_plus_one = datetime(2026, 11, 23, 9, 0, tzinfo=timezone(timedelta(hours=1)))
-    session.add(OdometerReading(vehicle_id=car.id, odometer_km=48000, read_at=accra_plus_one))
+    plus_one_hour = datetime(2026, 11, 23, 9, 0, tzinfo=timezone(timedelta(hours=1)))
+    session.add(OdometerReading(vehicle_id=car.id, odometer_km=48000, read_at=plus_one_hour))
     session.commit()
     session.expire_all()
 
@@ -82,3 +82,27 @@ def test_naive_datetimes_are_rejected(session):
     session.add(OdometerReading(vehicle_id=1, odometer_km=1, read_at=datetime(2026, 1, 1)))
     with pytest.raises(StatementError, match="naive datetime"):
         session.commit()
+
+
+def test_service_radius_reads_back_as_float(session):
+    """Matching engine does float maths on it (#67 review)."""
+    from app.models import Mechanic, Neighbourhood
+
+    session.add(Neighbourhood(name="Osu", lat=5.556, lng=-0.182))
+    session.flush()
+    session.add(
+        Mechanic(
+            id="M01",
+            name="DEMO",
+            neighbourhood="Osu",
+            lat=5.556,
+            lng=-0.182,
+            service_radius_km=10,
+            assessment_status="assessed",
+            contact_mode="demo_dialog",
+        )
+    )
+    session.commit()
+    session.expire_all()
+    radius = session.get(Mechanic, "M01").service_radius_km
+    assert isinstance(radius, float) and radius + 0.5 == 10.5
