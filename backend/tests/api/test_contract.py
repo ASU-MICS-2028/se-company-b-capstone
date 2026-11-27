@@ -15,15 +15,10 @@ CAR = {
     "powertrain": "petrol",
     "odometer_km": 48000,
 }
+# Routes with real logic and their own API tests (test_auth.py, ...).
+REAL = {("post", "/auth/register"), ("post", "/auth/login"), ("get", "/auth/me")}
+
 ROUTES = [
-    (
-        "post",
-        "/auth/register",
-        {"full_name": "Ama", "email": "ama@example.com", "password": "secret123"},
-        201,
-    ),
-    ("post", "/auth/login", {"login": "ama@example.com", "password": "secret123"}, 200),
-    ("get", "/auth/me", None, 200),
     ("get", "/vehicle-models", None, 200),
     ("get", "/vehicles", None, 200),
     ("post", "/vehicles", CAR, 201),
@@ -82,7 +77,7 @@ def test_stub_route(client, method, path, body, status):
 
 def test_every_documented_route_is_covered(client):
     """Fails when a route is added to the API without a row in ROUTES."""
-    tested = {(m, p.split("?")[0]) for m, p, _, _ in ROUTES}
+    tested = {(m, p.split("?")[0]) for m, p, _, _ in ROUTES} | REAL
     for path, ops in client.get("/openapi.json").json()["paths"].items():
         if not path.startswith(V):
             continue
@@ -103,8 +98,3 @@ def test_error_shape(client, path, status, code):
     assert res.status_code == status
     assert res.json()["error"]["code"] == code
     assert set(res.json()["error"]) == {"code", "message", "details"}
-
-
-def test_register_needs_email_or_phone(client):
-    res = client.post(V + "/auth/register", json={"full_name": "X", "password": "secret123"})
-    assert res.status_code == 422

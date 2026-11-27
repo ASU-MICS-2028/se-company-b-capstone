@@ -1,15 +1,15 @@
 # API contract v1
 
-**Status:** draft for team review (#11) · **Base path:** `/api/v1` · **Live spec:** Swagger at http://localhost:8000/docs (OpenAPI at `/openapi.json`)
+**Status:** draft for team review (#11). Auth is implemented (#49). · **Base path:** `/api/v1` · **Live spec:** Swagger at http://localhost:8000/docs (OpenAPI at `/openapi.json`)
 
-Every route below exists in the backend as a **stub** with real request/response schemas that returns example data. Real logic lands in the issue named per endpoint. Frontend work (#51) can build against the stubs now. The Pydantic schemas in `backend/app/modules/*/schemas.py` are the source of truth; if this page and Swagger disagree, Swagger wins and this page gets fixed.
+Apart from auth, every route below exists in the backend as a **stub** with real request/response schemas that returns example data. Real logic lands in the issue named per endpoint. Frontend work (#51) can build against the stubs now. The Pydantic schemas in `backend/app/modules/*/schemas.py` are the source of truth; if this page and Swagger disagree, Swagger wins and this page gets fixed.
 
 ## Conventions
 
 - **JSON**, `snake_case` keys, UTF-8.
 - **Dates** ISO 8601: `date` = `YYYY-MM-DD`; `datetime` = UTC with offset (`2026-11-23T06:00:00Z`). Datetimes sent without an offset are rejected. The reminder engine evaluates calendar dates in `Africa/Accra`.
 - **Distance** in kilometres. Decimals are JSON numbers; exact thresholds keep their fraction (`16093.44`).
-- **Auth:** `Authorization: Bearer <token>` from `/auth/login` or `/auth/register`. Roles: `driver`, `mechanic`, `admin`. *Stubbed until #49: the header is accepted but not checked.*
+- **Auth:** `Authorization: Bearer <token>` from `/auth/login` or `/auth/register`. Roles: `driver`, `mechanic`, `admin`. Auth endpoints are real (#49). The other routes are still stubs that accept the header without checking it, and each gets `CurrentUser` / `require_role(...)` when its logic lands.
 - **Ownership:** a driver only ever sees their own vehicles. Another user's vehicle returns **404**, not 403, so IDs don't leak.
 - **Pagination** on growing lists: `?page=1&page_size=20` (max 100). Response:
 
@@ -93,26 +93,27 @@ Every route below exists in the backend as a **stub** with real request/response
 - **Odometer rollback:** US-04 says "ask to confirm"; the rule spec says reject through the normal write path. The contract follows US-04 (`409` unless `confirm_lower: true`) and the engine treats confirmed-lower history as needing correction. *A&E + G&I to agree.*
 - **Air-filter search links:** R05, R08 and R10 have no `search_service` until a matching category exists. *Germain to confirm.*
 - **Snooze rules:** maximum length, and whether overdue cards can be snoozed. *A&E.*
-- **Phone format:** E.164 (`+233…`) assumed for sign-up. *A&E.*
+- **Phone format:** international (`+233…`) required for sign-up; spaces, dashes and brackets are stripped. *A&E to confirm.*
 
 ## Auth
 
 ### POST `/api/v1/auth/register` — Register
 
-- **Purpose:** Create an account with email **or** phone and log in.
+- **Purpose:** Create a **driver** account with email **or** phone (spaces in the phone are ignored) and log in. A `role` in the body is ignored; admins and mechanics are created with `python -m app.modules.auth.cli`.
 - **Auth:** none
 - **Supports:** US-01 · Sign up
-- **Implemented in:** #49
+- **Implemented in:** #49 (done)
 - **Success:** `201`
-- **Errors:** 422 `validation_error` (neither email nor phone, short password) · 409 `account_exists`
+- **Errors:** 422 `validation_error` (neither email nor phone, non-international phone, password under 8, blank name) · 409 `account_exists` ("An account with this email exists" / "...phone number exists")
 
 Request:
 
 ```json
 {
-  "full_name": "Ama",
+  "full_name": "Ama Mensah",
   "email": "ama@example.com",
-  "password": "secret123"
+  "phone": "+233 20 123 4567",
+  "password": "Demo-pass-2026"
 }
 ```
 
@@ -120,13 +121,14 @@ Response:
 
 ```json
 {
-  "access_token": "stub-token",
+  "access_token": "eyJzdWIiOjEsInJvbGUiOiJkcml2ZXIi...signature",
   "token_type": "bearer",
+  "expires_in": 43200,
   "user": {
     "id": 1,
     "full_name": "Ama Mensah",
     "email": "ama@example.com",
-    "phone": null,
+    "phone": "+233201234567",
     "role": "driver"
   }
 }
@@ -134,10 +136,10 @@ Response:
 
 ### POST `/api/v1/auth/login` — Log in
 
-- **Purpose:** Exchange email-or-phone + password for a bearer token.
+- **Purpose:** Exchange email-or-phone + password for a bearer token (`expires_in` seconds, default 12 h).
 - **Auth:** none
 - **Supports:** US-01
-- **Implemented in:** #49
+- **Implemented in:** #49 (done)
 - **Success:** `200`
 - **Errors:** 401 `invalid_credentials` (same message for unknown login and wrong password)
 
@@ -146,7 +148,7 @@ Request:
 ```json
 {
   "login": "ama@example.com",
-  "password": "secret123"
+  "password": "Demo-pass-2026"
 }
 ```
 
@@ -154,13 +156,14 @@ Response:
 
 ```json
 {
-  "access_token": "stub-token",
+  "access_token": "eyJzdWIiOjEsInJvbGUiOiJkcml2ZXIi...signature",
   "token_type": "bearer",
+  "expires_in": 43200,
   "user": {
     "id": 1,
     "full_name": "Ama Mensah",
     "email": "ama@example.com",
-    "phone": null,
+    "phone": "+233201234567",
     "role": "driver"
   }
 }
@@ -171,9 +174,9 @@ Response:
 - **Purpose:** Who am I, and which role.
 - **Auth:** any
 - **Supports:** all screens
-- **Implemented in:** #49
+- **Implemented in:** #49 (done)
 - **Success:** `200`
-- **Errors:** 401
+- **Errors:** 401 `unauthorized` (missing, invalid or expired token)
 
 Response:
 
@@ -182,7 +185,7 @@ Response:
   "id": 1,
   "full_name": "Ama Mensah",
   "email": "ama@example.com",
-  "phone": null,
+  "phone": "+233201234567",
   "role": "driver"
 }
 ```
