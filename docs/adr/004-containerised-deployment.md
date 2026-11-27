@@ -1,17 +1,20 @@
 # ADR-004: Containerised deployment with separate staging and production
 
-**Status:** Proposed (hosting target not chosen) · **Date:** 2026-11-24 · **Owner:** Eugene
+**Status:** Accepted (2026-11-27): host is a Contabo VPS running Coolify · **Date:** 2026-11-24, updated 2026-11-27 · **Owner:** Eugene
 
 ## Context
 
 We need a hosted **staging** environment for demo candidates and usability tests, and a **production** environment for the final demo on 10 and 18 December. The proposal requires HTTPS for any deployed service. Budget is close to zero, and the team has limited ops experience. A local Docker dev setup (bind-mounted source) is also being considered so teammates don't need Python and Node installed.
 
-## Decision (proposed)
+## Decision
 
-- Package the app as **two Docker images**: `autocare-api` (uvicorn) and `autocare-web` (static `vite build` behind nginx, which also proxies `/api`). Push them to GHCR.
+**Host (decided 2026-11-27):** the team's existing **Contabo VPS running [Coolify](https://coolify.io)**, a self-hosted platform that deploys Docker Compose apps from GitHub and handles HTTPS (Let's Encrypt) and routing. This is the "VPS + Docker Compose" option below, with Coolify taking care of the parts that needed an owner: TLS, redeploys and logs. Staging goes first; production follows from a tagged release on `main`.
+
+
+- Package the app as **two Docker images**: `autocare-api` (uvicorn) and `autocare-web` (static `vite build` behind nginx, which also proxies `/api`), defined in `docker-compose.yml`. For now Coolify builds them on the server from the branch it tracks. Pushing to GHCR and promoting the same image to production is the next step.
 - Run **staging** and **production** as separate deployments of the *same image*, differing only in env vars and secrets (GitHub Environments).
 - Deploy flow: push to `staging` → build, deploy to staging, smoke-test `/api/health`. Tag `vX.Y.Z` on `main` → promote the same image to production, with manual approval.
-- The hosting target is picked from the options below before Sprint 3.
+- Hosting target: chosen on 2026-11-27 (see above).
 
 ## Options compared
 
@@ -24,7 +27,7 @@ We need a hosted **staging** environment for demo candidates and usability tests
 | Staging + prod | Two Compose projects on one box | Two services | Two services or stacks |
 | Learning value for the course | High (real DevOps) | Low | High, but costly in time |
 
-Current leaning: **VPS + Docker Compose**. It's the cheapest option that keeps SQLite on a real disk, and Compose files can be shared with local dev. **Render** is the fallback if nobody can own a VPS.
+**Chosen: VPS + Docker Compose, through Coolify on the team's Contabo VPS** (2026-11-27). Originally the leaning: It's the cheapest option that keeps SQLite on a real disk, and Compose files can be shared with local dev. **Render** is the fallback if nobody can own a VPS.
 
 ## Consequences
 

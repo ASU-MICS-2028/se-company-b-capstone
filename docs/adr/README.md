@@ -8,5 +8,5 @@ To change a decision, add a new ADR that supersedes the old one. Don't rewrite h
 | [001](001-modular-monolith.md) | Modular monolith | Accepted |
 | [002](002-layered-modules.md) | Layered / light hexagonal structure per module | Accepted |
 | [003](003-sqlite-behind-repositories.md) | SQLite for the MVP, behind SQLAlchemy and repositories | Accepted |
-| [004](004-containerised-deployment.md) | Containerised deployment with staging and production | Proposed |
+| [004](004-containerised-deployment.md) | Containerised deployment with staging and production | Accepted (Contabo + Coolify) |
 | [005](005-design-patterns.md) | Design patterns in use | Accepted |
