@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.core.db import get_db
+from app.core.db import create_all, get_db
 from app.main import app
 
 
@@ -11,6 +11,7 @@ from app.main import app
 def client(tmp_path):
     """TestClient backed by a throwaway SQLite file."""
     engine = create_engine(f"sqlite:///{tmp_path / 'test.db'}")
+    create_all(engine)
     TestSession = sessionmaker(bind=engine)
 
     def override_get_db():

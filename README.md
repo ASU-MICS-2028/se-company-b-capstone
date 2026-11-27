@@ -45,6 +45,12 @@ make seed   # create the SQLite DB and load /data/seed (coming in Sprint 1)
 
 Backend config comes from environment variables. See [backend/.env.example](backend/.env.example).
 
+Sign-up only creates drivers. To create an admin (or mechanic) account locally:
+
+```bash
+cd backend && .venv/bin/python -m app.modules.auth.cli --name "Nkenten Admin" --email admin@example.com --role admin
+```
+
 ## How we work
 
 Branching (`main` ← `staging` ← `dev` ← `feat/<issue>-...`), conventional commits, PR rules and review: see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
