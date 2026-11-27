@@ -140,7 +140,7 @@ erDiagram
     string neighbourhood FK
     float lat
     float lng
-    decimal service_radius_km
+    float service_radius_km
     string assessment_status
     date assessed_on
     string assessor
