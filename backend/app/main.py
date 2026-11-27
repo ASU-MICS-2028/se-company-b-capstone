@@ -20,7 +20,7 @@ app = FastAPI(
     title="Nkenten AutoCare API",
     version=__version__,
     description="Contract v1. Routes under /api/v1 are stubs returning example data "
-    "until their issues land (#49, #50, #44, #45). See docs/api/contract.md.",
+    "until their issues land (#49, #50, #82, #44, #45). See docs/api/contract.md.",
 )
 errors.install(app)
 for r in (
