@@ -93,6 +93,8 @@ gh repo edit ASU-MICS-2028/se-company-b-capstone --default-branch dev
 
 Required check names are the CI job names: `backend`, `frontend`, `branch-policy`.
 
+> **Applied 2026-11-24** (#40), with `enforce_admins: true`. Every member is a repo admin, so without it anyone could bypass the rules. Nobody, admins included, can push directly to `dev`, `staging` or `main`.
+
 > **Path-filter caveat:** CI only runs when `backend/**` or `frontend/**` changes. If a check is *required* but never runs (for example, a docs-only PR), the PR waits forever. So we don't mark `backend`/`frontend` as required, only "require branches to be up to date" plus review. Reviewers must confirm CI is green before merging. Revisit when CI becomes cheap enough to run on every PR.
 
 ```bash
@@ -102,7 +104,7 @@ REPO=ASU-MICS-2028/se-company-b-capstone
 gh api -X PUT repos/$REPO/branches/dev/protection --input - <<'JSON'
 {
   "required_status_checks": null,
-  "enforce_admins": false,
+  "enforce_admins": true,
   "required_pull_request_reviews": { "required_approving_review_count": 1, "dismiss_stale_reviews": true },
   "restrictions": null,
   "allow_force_pushes": false,
@@ -115,7 +117,7 @@ for B in staging main; do
 gh api -X PUT repos/$REPO/branches/$B/protection --input - <<'JSON'
 {
   "required_status_checks": { "strict": true, "contexts": ["branch-policy"] },
-  "enforce_admins": false,
+  "enforce_admins": true,
   "required_pull_request_reviews": { "required_approving_review_count": 1, "dismiss_stale_reviews": true },
   "restrictions": null,
   "allow_force_pushes": false,
