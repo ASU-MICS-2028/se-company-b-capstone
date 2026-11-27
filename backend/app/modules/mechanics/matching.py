@@ -149,8 +149,11 @@ def resolve_neighbourhood(name: str, neighbourhoods: Iterable[Neighbourhood]) ->
         if _normalise(n.name) == wanted:
             return n
     suggestions = tuple(n.name for n in known if wanted and wanted[:3] in _normalise(n.name))
-    raise MatchingError("unknown_neighbourhood", f"Unknown neighbourhood: {name!r}",
-                        suggestions or tuple(n.name for n in known))
+    raise MatchingError(
+        "unknown_neighbourhood",
+        f"Unknown neighbourhood: {name!r}",
+        suggestions or tuple(n.name for n in known),
+    )
 
 
 def coordinates_origin(lat: float, lng: float) -> Origin:

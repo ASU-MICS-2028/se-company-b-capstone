@@ -224,7 +224,7 @@ Checked by loading the Sprint 1 seed package into these models: every record and
 `backend/app/seed.py` reads `data/seed/{vehicles,maintenance_rules,mechanics}.json` (G&I's format), **validates everything first**, then writes in one transaction. A rejected seed writes nothing.
 
 - **Order:** catalogue → sources → service categories and neighbourhoods → rules and applicability → mechanics.
-- **Categories and neighbourhoods are reference data** and load in every environment, because rules link to categories through `search_service`. **Mechanics are fictional demo data** and load only when `DEMO_MODE=true` (the default). Set it to `false` in production.
+- **Categories and neighbourhoods are reference data** and load in every environment, because rules link to categories through `search_service`. **Mechanics are fictional demo data** and load only when `DEMO_MODE=true` (the default, and what every environment uses in this course, including the final-demo production site). Seeding with `DEMO_MODE=false` also removes demo mechanics loaded earlier.
 - **Idempotent:** reference rows are upserted, so re-running never touches users, vehicles or service logs.
 - **Import checks (RT-18):**
   - every catalogue, source and `search_service` reference resolves

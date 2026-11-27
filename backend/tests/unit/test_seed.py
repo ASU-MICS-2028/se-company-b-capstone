@@ -192,3 +192,11 @@ def test_rejected_seed_writes_nothing(seed_dir, engine):
 
 def test_valid_fixture_has_no_problems():
     assert validate(VEHICLES, RULES, MECHANICS) == []
+
+
+def test_turning_demo_mode_off_removes_demo_mechanics(seed_dir, engine):
+    load(seed_dir, engine, demo=True)
+    assert count(engine, Mechanic) == 1
+    counts = load(seed_dir, engine, demo=False)
+    assert counts["demo_mechanics_removed"] == 1
+    assert count(engine, Mechanic) == count(engine, MechanicService) == 0

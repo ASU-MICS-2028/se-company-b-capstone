@@ -4,6 +4,7 @@
 
 Order: catalogue -> sources -> categories, neighbourhoods -> rules -> (demo mode only) mechanics.
 Idempotent: reference rows are upserted, so re-running never touches user data.
+With demo mode off, previously loaded demo mechanics are removed.
 """
 
 import argparse
@@ -175,7 +176,12 @@ def load(seed_dir: Path = DEFAULT_DIR, engine: Engine | None = None, demo: bool 
             neighbourhoods=len(mechanics["neighbourhoods"]),
         )
 
-        if demo:
+        if not demo:
+            # Demo listings left from an earlier demo-mode seed must go (services, change log
+            # and complaints cascade).
+            gone = s.execute(delete(Mechanic).where(Mechanic.is_demo)).rowcount
+            counts.update(demo_mechanics_removed=gone)
+        else:
             for m in mechanics["mechanics"]:
                 fields = {k: m[k] for k in m if k != "services"}
                 fields["assessed_on"] = _day(fields.get("assessed_on"))
