@@ -57,7 +57,7 @@ Branching (`main` ← `staging` ← `dev` ← `feat/<issue>-...`), conventional 
 | [DevOps: environments and pipeline](docs/devops.md) | ✅ |
 | [Architecture decisions (ADRs)](docs/adr/) | ✅ |
 | [C4 diagrams and deployment view](docs/architecture/) | ✅ |
-| [Data schema (ER diagram)](docs/data/) | Sprint 1, in progress |
+| [Data schema (ER diagram)](docs/data/schema.md) | ✅ |
 | [API contract v1](docs/api/) | Sprint 1, in progress |
 | [Testing strategy](docs/testing.md) | Sprint 1, in progress |
 | [Intelligence and quality package (index)](docs/README.md) | ✅ Sprint 1 |
