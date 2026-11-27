@@ -397,7 +397,7 @@ Response:
 - **Purpose:** Newest first (`service_date` desc, then `id` desc). Paginated.
 - **Auth:** owner
 - **Supports:** US-04 · Log service
-- **Implemented in:** #50
+- **Implemented in:** #82
 - **Success:** `200`
 - **Errors:** 404
 
@@ -429,7 +429,7 @@ Response:
 - **Purpose:** One row per `service_keys` entry (a combined engine+cabin filter job is two keys). Also records the odometer reading if given.
 - **Auth:** owner
 - **Supports:** US-04 · Log service
-- **Implemented in:** #50
+- **Implemented in:** #82
 - **Success:** `201`
 - **Errors:** 400 `future_date` · 409 `odometer_lower_than_latest` unless `confirm_lower: true` · 404 · 422
 
@@ -467,7 +467,7 @@ Response:
 - **Purpose:** Paginated, newest first.
 - **Auth:** owner
 - **Supports:** US-02
-- **Implemented in:** #50
+- **Implemented in:** #82
 - **Success:** `200`
 - **Errors:** 404
 
@@ -494,7 +494,7 @@ Response:
 - **Purpose:** Add a reading (`source: manual`). `read_at` defaults to now.
 - **Auth:** owner
 - **Supports:** US-02, US-05
-- **Implemented in:** #50
+- **Implemented in:** #82
 - **Success:** `201`
 - **Errors:** 400 `future_reading` · 409 `odometer_lower_than_latest` unless `confirm_lower` · 422 negative
 
