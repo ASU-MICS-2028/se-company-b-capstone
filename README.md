@@ -58,7 +58,7 @@ Branching (`main` ← `staging` ← `dev` ← `feat/<issue>-...`), conventional 
 | [Architecture decisions (ADRs)](docs/adr/) | ✅ |
 | [C4 diagrams and deployment view](docs/architecture/) | ✅ |
 | [Data schema (ER diagram)](docs/data/schema.md) | ✅ |
-| [API contract v1](docs/api/) | Sprint 1, in progress |
+| [API contract v1](docs/api/contract.md) (Swagger at `/docs`) | Draft for review |
 | [Testing strategy](docs/testing.md) | Sprint 1, in progress |
 | [Intelligence and quality package (index)](docs/README.md) | ✅ Sprint 1 |
 | [Reminder rule spec](docs/rules/01-reminder-rule-spec.md) | ✅ Sprint 1 |
